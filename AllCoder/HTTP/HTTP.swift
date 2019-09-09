@@ -97,23 +97,44 @@ struct HTTP {
 //        return data
 //    }
     
-    func async(route: Route, parameters: [URLQueryItem] = [], completion: ((Data) -> Void)? = nil) {
-        guard let path = route.path else {
-            return
-        }
+    func async(path: String, method: Method, parameters: [URLQueryItem] = [], completion: ((Data) -> Void)? = nil) {
         guard var urlComponents = URLComponents(string: origin.appendingPathComponent(path).absoluteString) else {
             return
         }
         urlComponents.queryItems = parameters
-        guard let url = urlComponents.url else {
+        var request: URLRequest?
+        switch method {
+        case .post:
+            if let url = URL(string: origin.appendingPathComponent(path).absoluteString) {
+                request = URLRequest(url: url)
+                request?.httpBody = urlComponents.query?.data(using: .utf8)
+                request?.httpMethod = "POST"
+            }
+        case .get:
+            fallthrough
+        case .put:
+            fallthrough
+        case .delete:
+            if let url = urlComponents.url {
+                request = URLRequest(url: url)
+            }
+        }
+        guard let r = request else {
             return
         }
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        URLSession.shared.dataTask(with: r) { data, response, error in
             guard let data = data else {
                 return
             }
             completion?(data)
-        }.resume()
+            }.resume()
+    }
+    
+    func async(route: Route, parameters: [URLQueryItem] = [], completion: ((Data) -> Void)? = nil) {
+        guard let path = route.path else {
+            return
+        }
+        async(path: path, method: route.method, parameters: parameters, completion: completion)
     }
     
     

@@ -12,7 +12,7 @@ class DashboardTabBarController: UITabBarController {
 //            print(try! jsonDecoder.decode([Material].self, from: response))
 //        }
         
-        print(UIScreen.main.bounds.width)
+        
         
         let homeViewController = HomeViewController()
         homeViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .featured, tag: 0)

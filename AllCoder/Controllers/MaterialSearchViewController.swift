@@ -114,15 +114,22 @@ class MaterialSearchViewController: UIViewController {
             return
         }
         let parameters = [
-            URLQueryItem(name: "id", value: String(material.id)),
-            URLQueryItem(name: "purchase", value: "true"),
+            URLQueryItem(name: "user_id", value: String(1)), // TODO: Auth user
+            URLQueryItem(name: "material_id", value: String(material.id))
         ]
-        HTTP().async(route: .init(resource: .materials, name: .index, options: [.api]), parameters: parameters) { response in
-            let jsonDecoder = JSONDecoder()
-            jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-            let material = try! jsonDecoder.decode(Material.self, from: response)
-            print(material)
+        HTTP().async(path: "api/materials/purchase", method: .post, parameters: parameters) { response in
+            print(String(data: response
+                , encoding:     .utf8))
         }
+//        let parameters = [
+//            URLQueryItem(name: "id", value: String(material.id)),
+//        ]
+//        HTTP().async(route: .init(resource: .materials, name: .index, options: [.api]), parameters: parameters) { response in
+//            let jsonDecoder = JSONDecoder()
+//            jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+//            let material = try! jsonDecoder.decode(Material.self, from: response)
+//
+//        }
     }
     
     @objc
@@ -166,7 +173,7 @@ extension MaterialSearchViewController: UIGestureRecognizerDelegate {
             return false
         }
         let velocity = panGestureRecognizer.velocity(in: view)
-        return materialPurchaseView.materialDetailsView.contentCollectionView.contentOffset.x == 0 &&
+        return materialPurchaseView.tabBarView.contentCollectionView.contentOffset.x == 0 &&
                velocity.y < velocity.x
     }
     
@@ -257,7 +264,7 @@ fileprivate class MaterialCardView: UIView {
             leftView.bottomAnchor.constraint(equalTo: separatorView.topAnchor),
             leftView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.4),
             ])
-        //thumbnailImageView.backgroundColor = .blue
+        thumbnailImageView.backgroundColor = .orange
         thumbnailImageView.contentMode = .scaleAspectFit
         thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -299,19 +306,21 @@ fileprivate class MaterialPurchaseView: UIView {
     
     var material: Material? {
         didSet {
-            materialDetailsView.material = material
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            if let formattedPrice = formatter.string(from: NSNumber(value: material?.price ?? 0)) {
-                priceLabel.text = "￥" + formattedPrice
+            guard let material = material else {
+                return
             }
+            headerLabel.text = material.title
+            materialMediaView.material = material
+            priceLabel.text = Price(locale: .japan, value: material.price).string
         }
     }
     
     let purchaseButton = UIButton()
-    let materialDetailsView = MaterialDetailsView()
+    let tabBarView = TabBarView()
     
+    private let headerLabel = UILabel()
     private let separatorView = UIView()
+    private let materialMediaView = MaterialMediaView()
     private let priceLabel = UILabel()
     
     override init(frame: CGRect) {
@@ -329,26 +338,38 @@ fileprivate class MaterialPurchaseView: UIView {
         let footerView = UIView()
         let footerLeftView = UIView()
         let footerRightView = UIView()
-        addSubview(materialDetailsView)
+        addSubview(headerLabel)
+        addSubview(tabBarView)
         addSubview(separatorView)
         addSubview(footerView)
         footerView.addSubview(footerLeftView)
         footerView.addSubview(footerRightView)
         footerLeftView.addSubview(priceLabel)
         footerRightView.addSubview(purchaseButton)
-        materialDetailsView.translatesAutoresizingMaskIntoConstraints = false
+        headerLabel.font = .medium
+        headerLabel.textAlignment = .center
+        headerLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            materialDetailsView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            materialDetailsView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            materialDetailsView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            materialDetailsView.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.85)
+            headerLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            headerLabel.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            headerLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            headerLabel.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.1)
+            ])
+        tabBarView.contentCollectionView.bounces = false
+        tabBarView.set(contentViews: ["レッスン": UIView(), "詳細": materialMediaView])
+        tabBarView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tabBarView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            tabBarView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            tabBarView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor),
+            tabBarView.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.75)
             ])
         separatorView.backgroundColor = .darkGray
         separatorView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             separatorView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
             separatorView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            separatorView.topAnchor.constraint(equalTo: materialDetailsView.bottomAnchor),
+            separatorView.topAnchor.constraint(equalTo: tabBarView.bottomAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: 1),
             ])
         footerView.translatesAutoresizingMaskIntoConstraints = false
@@ -393,163 +414,162 @@ fileprivate class MaterialPurchaseView: UIView {
             purchaseButton.widthAnchor.constraint(equalTo: footerRightView.widthAnchor, multiplier: 0.6),
             purchaseButton.heightAnchor.constraint(equalTo: priceLabel.heightAnchor),
             ])
-        
     }
     
 }
 
-
-fileprivate class MaterialDetailsView: UIView {
-    
-    var material: Material? {
-        didSet {
-            guard let material = material else {
-                return
-            }
-            titleLabel.text = material.title
-            lessonsTableView.lessons = material.lessons
-            materialMediaView.material = material
-        }
-    }
-    
-    let contentCollectionView = UICollectionView(frame: .zero, collectionViewLayout: {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        return layout
-    }())
-    
-    
-    private var tabUnderLineViewLeadingConstraint: NSLayoutConstraint?
-    private let lessonsTableView = LessonsTableView()
-    private let materialMediaView = MaterialMediaView()
-    private let titleLabel = UILabel()
-    private let lessonsTabButton = UIButton(type: .system)
-    private let mediaTabButton = UIButton(type: .system)
-    private let tabBarView = UIView()
-    private let tabsStackView = UIStackView()
-    private let tabUnderLineView = UIView()
-
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupViews()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        setupViews()
-    }
-    
-    private func setupViews() {
-        backgroundColor = .white
-        addSubview(titleLabel)
-        addSubview(tabBarView)
-        addSubview(contentCollectionView)
-        tabBarView.addSubview(tabsStackView)
-        tabBarView.addSubview(tabUnderLineView)
-        titleLabel.font = .boldMedium
-        titleLabel.textAlignment = .center
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            titleLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            titleLabel.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.1)
-            ])
-        lessonsTabButton.titleLabel?.font = .medium
-        lessonsTabButton.setTitle("レッスン", for: .normal)
-        lessonsTabButton.setTitleColor(.white, for: .normal)
-        lessonsTabButton.addTarget(self, action: #selector(onLessonsTabButtonTouchUpInside(_:)), for: .touchUpInside)
-        mediaTabButton.titleLabel?.font = .medium
-        mediaTabButton.setTitle("詳細", for: .normal)
-        mediaTabButton.setTitleColor(.white, for: .normal)
-        mediaTabButton.addTarget(self, action: #selector(onMediaTabButtonTouchUpInside(_:)), for: .touchUpInside)
-        tabBarView.backgroundColor = .systemBlue
-        tabBarView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            tabBarView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            tabBarView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            tabBarView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
-            tabBarView.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.1)
-            ])
-        tabsStackView.addArrangedSubview(lessonsTabButton)
-        tabsStackView.addArrangedSubview(mediaTabButton)
-        tabsStackView.distribution = .fillEqually
-        tabsStackView.axis = .horizontal
-        tabsStackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            tabsStackView.leadingAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.leadingAnchor),
-            tabsStackView.trailingAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.trailingAnchor),
-            tabsStackView.topAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.topAnchor),
-            tabsStackView.bottomAnchor.constraint(equalTo: tabUnderLineView.topAnchor),
-            ])
-        tabUnderLineView.backgroundColor = .lightGray
-        tabUnderLineView.translatesAutoresizingMaskIntoConstraints = false
-        tabUnderLineViewLeadingConstraint = tabUnderLineView.leadingAnchor.constraint(equalTo: tabsStackView.leadingAnchor)
-        NSLayoutConstraint.activate([
-            tabUnderLineViewLeadingConstraint!,
-            tabUnderLineView.bottomAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.bottomAnchor),
-            tabUnderLineView.widthAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.widthAnchor, multiplier: CGFloat(1) / CGFloat(tabsStackView.arrangedSubviews.count)),
-            tabUnderLineView.heightAnchor.constraint(equalToConstant: 5)
-            ])
-        contentCollectionView.dataSource = self
-        contentCollectionView.delegate = self
-        contentCollectionView.isPagingEnabled = true
-        contentCollectionView.bounces = false
-        contentCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: UICollectionViewCell.id)
-        contentCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            contentCollectionView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            contentCollectionView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            contentCollectionView.topAnchor.constraint(equalTo: tabBarView.bottomAnchor),
-            contentCollectionView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-            ])
-    }
-    
-    @objc
-    private func onLessonsTabButtonTouchUpInside(_ sender: UIButton) {
-        contentCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .left, animated: true)
-    }
-    
-    @objc
-    private func onMediaTabButtonTouchUpInside(_ sender: UIButton) {
-        contentCollectionView.scrollToItem(at: IndexPath(item: 1, section: 0), at: .left, animated: true)
-    }
-    
-}
-
-extension MaterialDetailsView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        tabUnderLineViewLeadingConstraint?.constant = (scrollView.contentOffset.x / contentCollectionView.bounds.width) * (tabsStackView.bounds.width / CGFloat(tabsStackView.arrangedSubviews.count))
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 2
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = contentCollectionView.dequeueReusableCell(withReuseIdentifier: UICollectionViewCell.id, for: indexPath)
-        let contentView = indexPath.row == 0 ? lessonsTableView : materialMediaView
-        cell.addSubview(contentView)
-        contentView.frame.size = cell.frame.size
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return contentCollectionView.bounds.size
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
-    }
-    
-    
-}
+//
+//fileprivate class MaterialDetailsView: UIView {
+//
+//    var material: Material? {
+//        didSet {
+//            guard let material = material else {
+//                return
+//            }
+//            titleLabel.text = material.title
+//            lessonsTableView.lessons = material.lessons
+//            materialMediaView.material = material
+//        }
+//    }
+//
+//    let contentCollectionView = UICollectionView(frame: .zero, collectionViewLayout: {
+//        let layout = UICollectionViewFlowLayout()
+//        layout.scrollDirection = .horizontal
+//        return layout
+//    }())
+//
+//
+//    private var tabUnderLineViewLeadingConstraint: NSLayoutConstraint?
+//    private let lessonsTableView = LessonsTableView()
+//    private let materialMediaView = MaterialMediaView()
+//    private let titleLabel = UILabel()
+//    private let lessonsTabButton = UIButton(type: .system)
+//    private let mediaTabButton = UIButton(type: .system)
+//    private let tabBarView = UIView()
+//    private let tabsStackView = UIStackView()
+//    private let tabUnderLineView = UIView()
+//
+//
+//    override init(frame: CGRect) {
+//        super.init(frame: frame)
+//        setupViews()
+//    }
+//
+//    required init?(coder aDecoder: NSCoder) {
+//        super.init(coder: aDecoder)
+//        setupViews()
+//    }
+//
+//    private func setupViews() {
+//        backgroundColor = .white
+//        addSubview(titleLabel)
+//        addSubview(tabBarView)
+//        addSubview(contentCollectionView)
+//        tabBarView.addSubview(tabsStackView)
+//        tabBarView.addSubview(tabUnderLineView)
+//        titleLabel.font = .boldMedium
+//        titleLabel.textAlignment = .center
+//        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            titleLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+//            titleLabel.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+//            titleLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+//            titleLabel.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.1)
+//            ])
+//        lessonsTabButton.titleLabel?.font = .medium
+//        lessonsTabButton.setTitle("レッスン", for: .normal)
+//        lessonsTabButton.setTitleColor(.white, for: .normal)
+//        lessonsTabButton.addTarget(self, action: #selector(onLessonsTabButtonTouchUpInside(_:)), for: .touchUpInside)
+//        mediaTabButton.titleLabel?.font = .medium
+//        mediaTabButton.setTitle("詳細", for: .normal)
+//        mediaTabButton.setTitleColor(.white, for: .normal)
+//        mediaTabButton.addTarget(self, action: #selector(onMediaTabButtonTouchUpInside(_:)), for: .touchUpInside)
+//        tabBarView.backgroundColor = .systemBlue
+//        tabBarView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            tabBarView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+//            tabBarView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+//            tabBarView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
+//            tabBarView.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.1)
+//            ])
+//        tabsStackView.addArrangedSubview(lessonsTabButton)
+//        tabsStackView.addArrangedSubview(mediaTabButton)
+//        tabsStackView.distribution = .fillEqually
+//        tabsStackView.axis = .horizontal
+//        tabsStackView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            tabsStackView.leadingAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.leadingAnchor),
+//            tabsStackView.trailingAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.trailingAnchor),
+//            tabsStackView.topAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.topAnchor),
+//            tabsStackView.bottomAnchor.constraint(equalTo: tabUnderLineView.topAnchor),
+//            ])
+//        tabUnderLineView.backgroundColor = .lightGray
+//        tabUnderLineView.translatesAutoresizingMaskIntoConstraints = false
+//        tabUnderLineViewLeadingConstraint = tabUnderLineView.leadingAnchor.constraint(equalTo: tabsStackView.leadingAnchor)
+//        NSLayoutConstraint.activate([
+//            tabUnderLineViewLeadingConstraint!,
+//            tabUnderLineView.bottomAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.bottomAnchor),
+//            tabUnderLineView.widthAnchor.constraint(equalTo: tabBarView.safeAreaLayoutGuide.widthAnchor, multiplier: CGFloat(1) / CGFloat(tabsStackView.arrangedSubviews.count)),
+//            tabUnderLineView.heightAnchor.constraint(equalToConstant: 5)
+//            ])
+//        contentCollectionView.dataSource = self
+//        contentCollectionView.delegate = self
+//        contentCollectionView.isPagingEnabled = true
+//        contentCollectionView.bounces = false
+//        contentCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: UICollectionViewCell.id)
+//        contentCollectionView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            contentCollectionView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+//            contentCollectionView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+//            contentCollectionView.topAnchor.constraint(equalTo: tabBarView.bottomAnchor),
+//            contentCollectionView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+//            ])
+//    }
+//
+//    @objc
+//    private func onLessonsTabButtonTouchUpInside(_ sender: UIButton) {
+//        contentCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .left, animated: true)
+//    }
+//
+//    @objc
+//    private func onMediaTabButtonTouchUpInside(_ sender: UIButton) {
+//        contentCollectionView.scrollToItem(at: IndexPath(item: 1, section: 0), at: .left, animated: true)
+//    }
+//
+//}
+//
+//extension MaterialDetailsView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+//
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        tabUnderLineViewLeadingConstraint?.constant = (scrollView.contentOffset.x / contentCollectionView.bounds.width) * (tabsStackView.bounds.width / CGFloat(tabsStackView.arrangedSubviews.count))
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        return 2
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        let cell = contentCollectionView.dequeueReusableCell(withReuseIdentifier: UICollectionViewCell.id, for: indexPath)
+//        let contentView = indexPath.row == 0 ? lessonsTableView : materialMediaView
+//        cell.addSubview(contentView)
+//        contentView.frame.size = cell.frame.size
+//        return cell
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+//        return contentCollectionView.bounds.size
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+//        return 0
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+//        return 0
+//    }
+//
+//
+//}
 
 fileprivate class LessonsTableView: UITableView {
     
@@ -654,6 +674,7 @@ fileprivate class MaterialMediaView: UIView {
             profileLeftView.widthAnchor.constraint(equalTo: profileView.safeAreaLayoutGuide.widthAnchor, multiplier: 0.3),
             profileLeftView.heightAnchor.constraint(equalTo: profileView.safeAreaLayoutGuide.heightAnchor, multiplier: 0.8)
             ])
+        thumbnailImageView.backgroundColor = .orange
         thumbnailImageView.contentMode = .scaleAspectFit
         thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
