@@ -1,0 +1,5 @@
+
+
+enum Locale {
+    case japan
+}
