@@ -2,21 +2,32 @@ import UIKit
 
 class HomeViewController: UIViewController {
     
+    var user: User? {
+        didSet {
+            fetchMaterials()
+        }
+    }
+    
     private let purchasedMaterialsTableView = PurchasedMaterialsTableView()
     private let createdMaterialsTableView = UITableView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchMaterials()
         setupViews()
     }
     
     private func fetchMaterials() {
+        guard let user = user else {
+            return
+        }
         let parameters = [
-            URLQueryItem(name: "user_id", value: "1"),
+            URLQueryItem(name: "user_id", value: String(user.id)),
             URLQueryItem(name: "purchased", value: nil),
         ]
-        HTTP().async(route: .init(resource: .materials, name: .index, options: [.api]), parameters: parameters) { response in
+        HTTP().async(route: .init(resource: .materials, name: .index), parameters: parameters) { response in
+            guard let response = response else {
+                return
+            }
             let jsonDecoder = JSONDecoder()
             jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
             DispatchQueue.main.async {

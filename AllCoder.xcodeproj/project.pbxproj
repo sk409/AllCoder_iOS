@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D7305BB623271F66006668B0 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BB523271F66006668B0 /* Auth.swift */; };
+		D7305BB923271F90006668B0 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BB823271F90006668B0 /* RegisterViewController.swift */; };
+		D7305BBB23275402006668B0 /* UIViewController+alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BBA23275402006668B0 /* UIViewController+alert.swift */; };
+		D7305BBD232782AD006668B0 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BBC232782AD006668B0 /* LoginViewController.swift */; };
+		D7305BBF2327833F006668B0 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BBE2327833F006668B0 /* FormView.swift */; };
+		D7305BC123278377006668B0 /* FormControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BC023278377006668B0 /* FormControlView.swift */; };
+		D7305BC423279ABA006668B0 /* FormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BC323279ABA006668B0 /* FormViewController.swift */; };
 		D749DF7723234F830010C673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D749DF7623234F830010C673 /* AppDelegate.swift */; };
 		D749DF7F23234F830010C673 /* AllCoder.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D749DF7D23234F830010C673 /* AllCoder.xcdatamodeld */; };
 		D749DF8123234F840010C673 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D749DF8023234F840010C673 /* Assets.xcassets */; };
@@ -58,6 +65,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D7305BB523271F66006668B0 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
+		D7305BB823271F90006668B0 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
+		D7305BBA23275402006668B0 /* UIViewController+alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+alert.swift"; sourceTree = "<group>"; };
+		D7305BBC232782AD006668B0 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		D7305BBE2327833F006668B0 /* FormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
+		D7305BC023278377006668B0 /* FormControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormControlView.swift; sourceTree = "<group>"; };
+		D7305BC323279ABA006668B0 /* FormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormViewController.swift; sourceTree = "<group>"; };
 		D749DF7323234F830010C673 /* AllCoder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AllCoder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D749DF7623234F830010C673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D749DF7E23234F830010C673 /* AllCoder.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = AllCoder.xcdatamodel; sourceTree = "<group>"; };
@@ -122,6 +136,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D7305BB723271F6E006668B0 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				D7305BB823271F90006668B0 /* RegisterViewController.swift */,
+				D7305BBC232782AD006668B0 /* LoginViewController.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		D7305BC223279AAD006668B0 /* Form */ = {
+			isa = PBXGroup;
+			children = (
+				D7305BB723271F6E006668B0 /* Auth */,
+				D7305BC323279ABA006668B0 /* FormViewController.swift */,
+			);
+			path = Form;
+			sourceTree = "<group>";
+		};
 		D749DF6A23234F830010C673 = {
 			isa = PBXGroup;
 			children = (
@@ -151,6 +183,7 @@
 				D749DFA8232350390010C673 /* Views */,
 				D749DFA7232350310010C673 /* Controllers */,
 				D749DF7623234F830010C673 /* AppDelegate.swift */,
+				D7305BB523271F66006668B0 /* Auth.swift */,
 				D7FE8B7A2325EBAC00F4C6F5 /* Locale.swift */,
 				D7FE8B782325EB9900F4C6F5 /* Price.swift */,
 				D749DF8023234F840010C673 /* Assets.xcassets */,
@@ -182,6 +215,7 @@
 		D749DFA7232350310010C673 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				D7305BC223279AAD006668B0 /* Form */,
 				D749DFAF232363660010C673 /* DashboardTabBarController.swift */,
 				D749DFB1232363DA0010C673 /* HomeViewController.swift */,
 				D749DFB3232363F00010C673 /* MessagesViewController.swift */,
@@ -195,6 +229,8 @@
 			children = (
 				D7F0615C2323AE990019B224 /* LessonsView.swift */,
 				D7FE8B7E2326112200F4C6F5 /* TabBarView.swift */,
+				D7305BBE2327833F006668B0 /* FormView.swift */,
+				D7305BC023278377006668B0 /* FormControlView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -233,6 +269,7 @@
 				D7F0616023247DE10019B224 /* UIView+AnimationUtilities.swift */,
 				D7FE8B742325E5EA00F4C6F5 /* UIViewController+blackout.swift */,
 				D7FE8B7C2325F81200F4C6F5 /* UIView+sizeThatFits.swift */,
+				D7305BBA23275402006668B0 /* UIViewController+alert.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -370,14 +407,18 @@
 				D749DFAE232358370010C673 /* Material.swift in Sources */,
 				D7FE8B7F2326112200F4C6F5 /* TabBarView.swift in Sources */,
 				D7F06165232504830019B224 /* Folder.swift in Sources */,
+				D7305BC123278377006668B0 /* FormControlView.swift in Sources */,
 				D749DF7F23234F830010C673 /* AllCoder.xcdatamodeld in Sources */,
 				D7F0616D23251C4C0019B224 /* Description.swift in Sources */,
 				D7F0616123247DE10019B224 /* UIView+AnimationUtilities.swift in Sources */,
 				D7FE8B7B2325EBAC00F4C6F5 /* Locale.swift in Sources */,
 				D7FE8B7D2325F81200F4C6F5 /* UIView+sizeThatFits.swift in Sources */,
 				D7F0615523238ABF0019B224 /* Lesson.swift in Sources */,
+				D7305BBB23275402006668B0 /* UIViewController+alert.swift in Sources */,
 				D7F061632325039B0019B224 /* User.swift in Sources */,
 				D749DFB0232363660010C673 /* DashboardTabBarController.swift in Sources */,
+				D7305BB623271F66006668B0 /* Auth.swift in Sources */,
+				D7305BBD232782AD006668B0 /* LoginViewController.swift in Sources */,
 				D7FE8B752325E5EA00F4C6F5 /* UIViewController+blackout.swift in Sources */,
 				D7F06167232506B90019B224 /* File.swift in Sources */,
 				D749DFAC2323504C0010C673 /* HTTP.swift in Sources */,
@@ -388,12 +429,15 @@
 				D749DFB2232363DA0010C673 /* HomeViewController.swift in Sources */,
 				D749DFB4232363F00010C673 /* MessagesViewController.swift in Sources */,
 				D7FE8B792325EB9900F4C6F5 /* Price.swift in Sources */,
+				D7305BBF2327833F006668B0 /* FormView.swift in Sources */,
 				D7F06169232511C50019B224 /* LessonComment.swift in Sources */,
 				D7F0617123251DA50019B224 /* Question.swift in Sources */,
 				D7F061592323A8820019B224 /* UIColor+colors.swift in Sources */,
 				D7F0615123236B7B0019B224 /* UIFont+AppFonts.swift in Sources */,
 				D7F0615D2323AE990019B224 /* LessonsView.swift in Sources */,
 				D749DF7723234F830010C673 /* AppDelegate.swift in Sources */,
+				D7305BC423279ABA006668B0 /* FormViewController.swift in Sources */,
+				D7305BB923271F90006668B0 /* RegisterViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

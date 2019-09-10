@@ -2,6 +2,17 @@ import UIKit
 
 class DashboardTabBarController: UITabBarController {
     
+    var user: User? {
+        didSet {
+            homeViewController.user = user
+            materialSearchViewController.user = user
+        }
+    }
+    
+    private let homeViewController = HomeViewController()
+    private let materialSearchViewController = MaterialSearchViewController()
+    private let messagesViewController = MessagesViewController()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -14,11 +25,9 @@ class DashboardTabBarController: UITabBarController {
         
         
         
-        let homeViewController = HomeViewController()
+        
         homeViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .featured, tag: 0)
-        let materialSearchViewController = MaterialSearchViewController()
         materialSearchViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 1)
-        let messagesViewController = MessagesViewController()
         messagesViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 2)
         setViewControllers([homeViewController, materialSearchViewController, messagesViewController], animated: false)
         

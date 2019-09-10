@@ -9,11 +9,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+        Auth.shared.logout()
         window = UIWindow()
         window?.makeKeyAndVisible()
-        window?.rootViewController = DashboardTabBarController()
-        
+        if Auth.shared.isLoggedIn() {
+            let dashboardTabBarController = DashboardTabBarController()
+            dashboardTabBarController.user = Auth.shared.user
+            window?.rootViewController = dashboardTabBarController
+        } else {
+            window?.rootViewController = LoginViewController()
+        }
         return true
     }
 

@@ -11,13 +11,15 @@ struct HTTP {
     
     struct Route {
         
+        enum API: String {
+            case register
+            case login
+        }
+        
         enum Resource: String {
             case materials
             case lessons
-        }
-        
-        enum Option: String {
-            case api
+            case users
         }
         
         enum Name: String {
@@ -33,27 +35,42 @@ struct HTTP {
         var path: String?
         let method: Method
         
-        init(resource: Resource, name: Name, options: [Option] = [], id: Int? = nil) {
+        init(api: API) {
+            var path = "api/"
+            switch api {
+            case .register:
+                path += api.rawValue
+                method = .post
+            case .login:
+                path += api.rawValue
+                method = .post
+            }
+            self.path = path
+        }
+        
+        init(resource: Resource, name: Name, id: Int? = nil) {
+            var path = "api/"
             switch name {
             case .store:
                 fallthrough
             case .index:
-                path = resource.rawValue
+                path += resource.rawValue
             case .create:
-                path = resource.rawValue + "/" + name.rawValue
+                path += resource.rawValue + "/" + name.rawValue
             case .destroy:
                 fallthrough
             case .show:
                 fallthrough
             case .update:
                 if let id = id {
-                    path = resource.rawValue + "/" + String(id)
+                    path += resource.rawValue + "/" + String(id)
                 }
             case .edit:
                 if let id = id {
-                    path = resource.rawValue + "/" + String(id) + "/" + name.rawValue
+                    path += resource.rawValue + "/" + String(id) + "/" + name.rawValue
                 }
             }
+            self.path = path
             switch name {
             case .store:
                 method = .post
@@ -70,10 +87,6 @@ struct HTTP {
             case .edit:
                 method = .get
             }
-            guard let path = path else {
-                return
-            }
-            self.path = options.map{ $0.rawValue }.joined(separator: "/") + "/" + path
         }
         
     }
@@ -84,21 +97,25 @@ struct HTTP {
         self.origin = origin
     }
     
-//    func sync(route: Route, parameters: [URLQueryItem] = []) -> Data? {
-//        let semaphore = DispatchSemaphore(value: 0)
-//        var data: Data?
-//        async(route: route, parameters: parameters) { response in
-//            defer {
-//                semaphore.signal()
-//            }
-//            data = response
-//        }
-//        semaphore.wait()
-//        return data
-//    }
+    func sync(route: Route, parameters: [URLQueryItem] = []) -> Data? {
+        guard let path = route.path else {
+            return nil
+        }
+        var data: Data?
+        let semaphore = DispatchSemaphore(value: 0)
+        async(path: path, method: route.method, parameters: parameters) { response in
+            defer {
+                semaphore.signal()
+            }
+            data = response
+        }
+        semaphore.wait()
+        return data
+    }
     
-    func async(path: String, method: Method, parameters: [URLQueryItem] = [], completion: ((Data) -> Void)? = nil) {
+    func async(path: String, method: Method, parameters: [URLQueryItem] = [], completion: ((Data?) -> Void)? = nil) {
         guard var urlComponents = URLComponents(string: origin.appendingPathComponent(path).absoluteString) else {
+            completion?(nil)
             return
         }
         urlComponents.queryItems = parameters
@@ -120,17 +137,17 @@ struct HTTP {
             }
         }
         guard let r = request else {
+            completion?(nil)
             return
         }
+        print(r.url)
+        print(parameters)
         URLSession.shared.dataTask(with: r) { data, response, error in
-            guard let data = data else {
-                return
-            }
             completion?(data)
             }.resume()
     }
     
-    func async(route: Route, parameters: [URLQueryItem] = [], completion: ((Data) -> Void)? = nil) {
+    func async(route: Route, parameters: [URLQueryItem] = [], completion: ((Data?) -> Void)? = nil) {
         guard let path = route.path else {
             return
         }

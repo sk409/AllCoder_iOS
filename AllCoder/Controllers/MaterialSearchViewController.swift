@@ -2,6 +2,8 @@ import UIKit
 
 class MaterialSearchViewController: UIViewController {
     
+    var user: User?
+    
     private var materialPurchaseViewLeadingConstraint: NSLayoutConstraint?
     private let panGestureRecognizer = UIPanGestureRecognizer()
     private let materialPurchaseView = MaterialPurchaseView()
@@ -66,7 +68,10 @@ class MaterialSearchViewController: UIViewController {
     
     private func fetchMaterials() {
         let http = HTTP()
-        http.async(route: .init(resource: .materials, name: .index, options: [.api])) { response in
+        http.async(route: .init(resource: .materials, name: .index)) { response in
+            guard let response = response else {
+                return
+            }
             let jsonDecoder = JSONDecoder()
             jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
             guard let materials = try? jsonDecoder.decode([Material].self, from: response) else {
@@ -110,16 +115,17 @@ class MaterialSearchViewController: UIViewController {
     
     @objc
     private func onTouchUpInsideDownloadMaterialButton(_ sender: UIButton) {
-        guard let material = materialPurchaseConfirmationAlertView.material else {
+        guard let material = materialPurchaseConfirmationAlertView.material,
+              let user = user
+            else {
             return
         }
         let parameters = [
-            URLQueryItem(name: "user_id", value: String(1)), // TODO: Auth user
+            URLQueryItem(name: "user_id", value: String(user.id)),
             URLQueryItem(name: "material_id", value: String(material.id))
         ]
         HTTP().async(path: "api/materials/purchase", method: .post, parameters: parameters) { response in
-            print(String(data: response
-                , encoding:     .utf8))
+            // TODO: 購入後の処理
         }
 //        let parameters = [
 //            URLQueryItem(name: "id", value: String(material.id)),
