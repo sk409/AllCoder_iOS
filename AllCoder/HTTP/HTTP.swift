@@ -140,6 +140,8 @@ struct HTTP {
             completion?(nil)
             return
         }
+//        print(r.url)
+//        print(parameters)
         URLSession.shared.dataTask(with: r) { data, response, error in
             completion?(data)
             }.resume()

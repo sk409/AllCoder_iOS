@@ -73,16 +73,15 @@ class RegisterViewController: FormViewController {
             alert(title: alertErrorTitle, message: "確認用パスワードが一致していません。")
             return
         }
-        Auth.shared.register(userName: userName, emailAddress: emailAddress, password: password) { userId in
+        Auth.shared.register(userName: userName, emailAddress: emailAddress, password: password) { user in
             DispatchQueue.main.async {
-                guard let userId = userId else {
+                guard let user = user else {
                     self.alert(title: alertErrorTitle, message: "登録時にエラーが発生しました")
                     return
                 }
                 self.alert(message: "登録に成功しました") {
-                    Auth.shared.login(userId: userId)
                     let dashboardTabBarController = DashboardTabBarController()
-                    dashboardTabBarController.user = Auth.shared.user
+                    dashboardTabBarController.user = user
                     self.present(dashboardTabBarController, animated: true)
                 }
             }

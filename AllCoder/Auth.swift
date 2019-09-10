@@ -8,8 +8,9 @@ class Auth {
     
     private(set) var user: User?
     
-    func register(userName: String, emailAddress: String, password: String, completion: ((Int?) -> Void)? = nil) {
+    func register(userName: String, emailAddress: String, password: String, completion: ((User?) -> Void)? = nil) {
         guard !isLoggedIn() else {
+            completion?(nil)
             return
         }
         let parameters = [
@@ -18,26 +19,21 @@ class Auth {
             URLQueryItem(name: "password", value: password),
         ]
         HTTP().async(route: .init(api: .register), parameters: parameters) { response in
-            var userId: Int?
-            defer {
-                completion?(userId)
-            }
             guard let response = response else {
+                completion?(nil)
                 return
             }
-            guard let string = String(data: response, encoding: .utf8) else {
+            let jsonDecoder = JSONDecoder()
+            jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+            guard let user = try? jsonDecoder.decode(User.self, from: response) else {
+                completion?(nil)
                 return
             }
-            userId = Int(string)
+            self.user = user
+            self.login(emailAddress: emailAddress, password: password) { _ in
+                completion?(self.user)
+            }
         }
-    }
-    
-    func login(userId: Int) {
-        guard !isLoggedIn() else {
-            return
-        }
-        UserDefaults.standard.set(userId, forKey: Auth.userIdKey)
-        fetchUser()
     }
     
     func login(emailAddress: String, password: String, completion: ((User?) -> Void)? = nil) {
@@ -55,6 +51,10 @@ class Auth {
             let jsonDecoder = JSONDecoder()
             jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
             self.user = try? jsonDecoder.decode(User.self, from: response)
+            guard let user = self.user else {
+                return
+            }
+            UserDefaults.standard.set(user.id, forKey: Auth.userIdKey)
         }
     }
     
