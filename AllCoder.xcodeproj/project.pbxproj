@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D70EB6922328A0FC0022D9C1 /* FileTreeItemHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6912328A0FC0022D9C1 /* FileTreeItemHolder.swift */; };
+		D70EB6942328A2D20022D9C1 /* FileTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6932328A2D20022D9C1 /* FileTreeView.swift */; };
+		D70EB6962328B5C60022D9C1 /* String+subscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6952328B5C60022D9C1 /* String+subscript.swift */; };
 		D7305BB623271F66006668B0 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BB523271F66006668B0 /* Auth.swift */; };
 		D7305BB923271F90006668B0 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BB823271F90006668B0 /* RegisterViewController.swift */; };
 		D7305BBB23275402006668B0 /* UIViewController+alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BBA23275402006668B0 /* UIViewController+alert.swift */; };
@@ -14,6 +17,11 @@
 		D7305BBF2327833F006668B0 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BBE2327833F006668B0 /* FormView.swift */; };
 		D7305BC123278377006668B0 /* FormControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BC023278377006668B0 /* FormControlView.swift */; };
 		D7305BC423279ABA006668B0 /* FormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BC323279ABA006668B0 /* FormViewController.swift */; };
+		D73599D323287092004D985E /* FolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73599D223287092004D985E /* FolderView.swift */; };
+		D73599D723287DD0004D985E /* FileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73599D623287DD0004D985E /* FileView.swift */; };
+		D73599D923287E14004D985E /* FileTreeItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73599D823287E14004D985E /* FileTreeItemView.swift */; };
+		D73599DB232880D8004D985E /* LessonViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73599DA232880D8004D985E /* LessonViewController.swift */; };
+		D73599DD23289B69004D985E /* NSNotification.Name+names.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73599DC23289B69004D985E /* NSNotification.Name+names.swift */; };
 		D749DF7723234F830010C673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D749DF7623234F830010C673 /* AppDelegate.swift */; };
 		D749DF7F23234F830010C673 /* AllCoder.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D749DF7D23234F830010C673 /* AllCoder.xcdatamodeld */; };
 		D749DF8123234F840010C673 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D749DF8023234F840010C673 /* Assets.xcassets */; };
@@ -30,7 +38,6 @@
 		D7F0615523238ABF0019B224 /* Lesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F0615423238ABF0019B224 /* Lesson.swift */; };
 		D7F061592323A8820019B224 /* UIColor+colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F061582323A8820019B224 /* UIColor+colors.swift */; };
 		D7F0615B2323ACC70019B224 /* UICollectionViewCell+id.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F0615A2323ACC70019B224 /* UICollectionViewCell+id.swift */; };
-		D7F0615D2323AE990019B224 /* LessonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F0615C2323AE990019B224 /* LessonsView.swift */; };
 		D7F0616123247DE10019B224 /* UIView+AnimationUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F0616023247DE10019B224 /* UIView+AnimationUtilities.swift */; };
 		D7F061632325039B0019B224 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F061622325039B0019B224 /* User.swift */; };
 		D7F06165232504830019B224 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F06164232504830019B224 /* Folder.swift */; };
@@ -65,6 +72,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D70EB6912328A0FC0022D9C1 /* FileTreeItemHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeItemHolder.swift; sourceTree = "<group>"; };
+		D70EB6932328A2D20022D9C1 /* FileTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeView.swift; sourceTree = "<group>"; };
+		D70EB6952328B5C60022D9C1 /* String+subscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+subscript.swift"; sourceTree = "<group>"; };
 		D7305BB523271F66006668B0 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		D7305BB823271F90006668B0 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		D7305BBA23275402006668B0 /* UIViewController+alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+alert.swift"; sourceTree = "<group>"; };
@@ -72,6 +82,11 @@
 		D7305BBE2327833F006668B0 /* FormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
 		D7305BC023278377006668B0 /* FormControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormControlView.swift; sourceTree = "<group>"; };
 		D7305BC323279ABA006668B0 /* FormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormViewController.swift; sourceTree = "<group>"; };
+		D73599D223287092004D985E /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
+		D73599D623287DD0004D985E /* FileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileView.swift; sourceTree = "<group>"; };
+		D73599D823287E14004D985E /* FileTreeItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeItemView.swift; sourceTree = "<group>"; };
+		D73599DA232880D8004D985E /* LessonViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonViewController.swift; sourceTree = "<group>"; };
+		D73599DC23289B69004D985E /* NSNotification.Name+names.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotification.Name+names.swift"; sourceTree = "<group>"; };
 		D749DF7323234F830010C673 /* AllCoder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AllCoder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D749DF7623234F830010C673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D749DF7E23234F830010C673 /* AllCoder.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = AllCoder.xcdatamodel; sourceTree = "<group>"; };
@@ -94,7 +109,6 @@
 		D7F0615423238ABF0019B224 /* Lesson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lesson.swift; sourceTree = "<group>"; };
 		D7F061582323A8820019B224 /* UIColor+colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+colors.swift"; sourceTree = "<group>"; };
 		D7F0615A2323ACC70019B224 /* UICollectionViewCell+id.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionViewCell+id.swift"; sourceTree = "<group>"; };
-		D7F0615C2323AE990019B224 /* LessonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonsView.swift; sourceTree = "<group>"; };
 		D7F0616023247DE10019B224 /* UIView+AnimationUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+AnimationUtilities.swift"; sourceTree = "<group>"; };
 		D7F061622325039B0019B224 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		D7F06164232504830019B224 /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
@@ -154,6 +168,25 @@
 			path = Form;
 			sourceTree = "<group>";
 		};
+		D73599D12328707B004D985E /* FileTree */ = {
+			isa = PBXGroup;
+			children = (
+				D73599D223287092004D985E /* FolderView.swift */,
+				D73599D623287DD0004D985E /* FileView.swift */,
+				D73599D823287E14004D985E /* FileTreeItemView.swift */,
+				D70EB6932328A2D20022D9C1 /* FileTreeView.swift */,
+			);
+			path = FileTree;
+			sourceTree = "<group>";
+		};
+		D73599DE2328A0C4004D985E /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				D70EB6912328A0FC0022D9C1 /* FileTreeItemHolder.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
 		D749DF6A23234F830010C673 = {
 			isa = PBXGroup;
 			children = (
@@ -177,6 +210,7 @@
 		D749DF7523234F830010C673 /* AllCoder */ = {
 			isa = PBXGroup;
 			children = (
+				D73599DE2328A0C4004D985E /* Protocols */,
 				D7F0614F23236B730019B224 /* Extensions */,
 				D749DFAA232350410010C673 /* HTTP */,
 				D749DFA92323503D0010C673 /* Models */,
@@ -220,6 +254,7 @@
 				D749DFB1232363DA0010C673 /* HomeViewController.swift */,
 				D749DFB3232363F00010C673 /* MessagesViewController.swift */,
 				D749DFB52323660E0010C673 /* MaterialSearchViewController.swift */,
+				D73599DA232880D8004D985E /* LessonViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -227,7 +262,7 @@
 		D749DFA8232350390010C673 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				D7F0615C2323AE990019B224 /* LessonsView.swift */,
+				D73599D12328707B004D985E /* FileTree */,
 				D7FE8B7E2326112200F4C6F5 /* TabBarView.swift */,
 				D7305BBE2327833F006668B0 /* FormView.swift */,
 				D7305BC023278377006668B0 /* FormControlView.swift */,
@@ -270,6 +305,8 @@
 				D7FE8B742325E5EA00F4C6F5 /* UIViewController+blackout.swift */,
 				D7FE8B7C2325F81200F4C6F5 /* UIView+sizeThatFits.swift */,
 				D7305BBA23275402006668B0 /* UIViewController+alert.swift */,
+				D73599DC23289B69004D985E /* NSNotification.Name+names.swift */,
+				D70EB6952328B5C60022D9C1 /* String+subscript.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -409,6 +446,7 @@
 				D7F06165232504830019B224 /* Folder.swift in Sources */,
 				D7305BC123278377006668B0 /* FormControlView.swift in Sources */,
 				D749DF7F23234F830010C673 /* AllCoder.xcdatamodeld in Sources */,
+				D73599DD23289B69004D985E /* NSNotification.Name+names.swift in Sources */,
 				D7F0616D23251C4C0019B224 /* Description.swift in Sources */,
 				D7F0616123247DE10019B224 /* UIView+AnimationUtilities.swift in Sources */,
 				D7FE8B7B2325EBAC00F4C6F5 /* Locale.swift in Sources */,
@@ -419,24 +457,30 @@
 				D749DFB0232363660010C673 /* DashboardTabBarController.swift in Sources */,
 				D7305BB623271F66006668B0 /* Auth.swift in Sources */,
 				D7305BBD232782AD006668B0 /* LoginViewController.swift in Sources */,
+				D73599D323287092004D985E /* FolderView.swift in Sources */,
+				D73599D923287E14004D985E /* FileTreeItemView.swift in Sources */,
 				D7FE8B752325E5EA00F4C6F5 /* UIViewController+blackout.swift in Sources */,
 				D7F06167232506B90019B224 /* File.swift in Sources */,
+				D70EB6922328A0FC0022D9C1 /* FileTreeItemHolder.swift in Sources */,
 				D749DFAC2323504C0010C673 /* HTTP.swift in Sources */,
 				D7F0616B232517060019B224 /* MaterialComment.swift in Sources */,
 				D7F0615B2323ACC70019B224 /* UICollectionViewCell+id.swift in Sources */,
+				D70EB6962328B5C60022D9C1 /* String+subscript.swift in Sources */,
 				D7F0616F23251D170019B224 /* DescriptionTarget.swift in Sources */,
 				D749DFB62323660E0010C673 /* MaterialSearchViewController.swift in Sources */,
 				D749DFB2232363DA0010C673 /* HomeViewController.swift in Sources */,
+				D73599D723287DD0004D985E /* FileView.swift in Sources */,
 				D749DFB4232363F00010C673 /* MessagesViewController.swift in Sources */,
 				D7FE8B792325EB9900F4C6F5 /* Price.swift in Sources */,
 				D7305BBF2327833F006668B0 /* FormView.swift in Sources */,
 				D7F06169232511C50019B224 /* LessonComment.swift in Sources */,
+				D70EB6942328A2D20022D9C1 /* FileTreeView.swift in Sources */,
 				D7F0617123251DA50019B224 /* Question.swift in Sources */,
 				D7F061592323A8820019B224 /* UIColor+colors.swift in Sources */,
 				D7F0615123236B7B0019B224 /* UIFont+AppFonts.swift in Sources */,
-				D7F0615D2323AE990019B224 /* LessonsView.swift in Sources */,
 				D749DF7723234F830010C673 /* AppDelegate.swift in Sources */,
 				D7305BC423279ABA006668B0 /* FormViewController.swift in Sources */,
+				D73599DB232880D8004D985E /* LessonViewController.swift in Sources */,
 				D7305BB923271F90006668B0 /* RegisterViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

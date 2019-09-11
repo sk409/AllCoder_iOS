@@ -2,14 +2,42 @@ import UIKit
 
 extension UIFont {
     
-    static let tiny = UIFont.systemFont(ofSize: UIScreen.main.bounds.width * 0.046)
-    static let small = UIFont.systemFont(ofSize: tiny.pointSize * 1.3)
-    static let medium = UIFont.systemFont(ofSize: small.pointSize * 1.3)
-    static let large = UIFont.systemFont(ofSize: medium.pointSize * 1.3)
+    static var tiny: UIFont {
+        return UIFont.systemFont(ofSize: baseScreenSize * 0.046)
+    }
+    static var small: UIFont {
+        return UIFont.systemFont(ofSize: tiny.pointSize * 1.3)
+    }
+    static var medium: UIFont {
+        return UIFont.systemFont(ofSize: small.pointSize * 1.3)
+    }
+    static var large: UIFont {
+        return UIFont.systemFont(ofSize: medium.pointSize * 1.3)
+    }
     
-    static let boldTiny = UIFont.boldSystemFont(ofSize: tiny.pointSize)
-    static let boldSmall = UIFont.boldSystemFont(ofSize: small.pointSize)
-    static let boldMedium = UIFont.boldSystemFont(ofSize: medium.pointSize)
-    static let boldLarge = UIFont.boldSystemFont(ofSize: large.pointSize)
+    static var boldTiny: UIFont {
+        return UIFont.boldSystemFont(ofSize: tiny.pointSize)
+    }
+    static var boldSmall: UIFont {
+        return UIFont.boldSystemFont(ofSize: small.pointSize)
+    }
+    static var boldMedium: UIFont {
+        return UIFont.boldSystemFont(ofSize: medium.pointSize)
+    }
+    static var boldLarge: UIFont {
+        return UIFont.boldSystemFont(ofSize: large.pointSize)
+    }
+    
+    private static var baseScreenSize: CGFloat {
+        let orientation = UIApplication.shared.statusBarOrientation
+        switch orientation {
+        case .landscapeLeft:
+            fallthrough
+        case .landscapeRight:
+            return UIScreen.main.bounds.height
+        default:
+            return UIScreen.main.bounds.width
+        }
+    }
     
 }
