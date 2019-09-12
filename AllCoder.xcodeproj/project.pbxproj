@@ -10,6 +10,7 @@
 		D70EB6922328A0FC0022D9C1 /* FileTreeItemHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6912328A0FC0022D9C1 /* FileTreeItemHolder.swift */; };
 		D70EB6942328A2D20022D9C1 /* FileTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6932328A2D20022D9C1 /* FileTreeView.swift */; };
 		D70EB6962328B5C60022D9C1 /* String+subscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6952328B5C60022D9C1 /* String+subscript.swift */; };
+		D73059682329E26800B8A420 /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73059672329E26800B8A420 /* Appearance.swift */; };
 		D7305BB623271F66006668B0 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BB523271F66006668B0 /* Auth.swift */; };
 		D7305BB923271F90006668B0 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BB823271F90006668B0 /* RegisterViewController.swift */; };
 		D7305BBB23275402006668B0 /* UIViewController+alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7305BBA23275402006668B0 /* UIViewController+alert.swift */; };
@@ -75,6 +76,7 @@
 		D70EB6912328A0FC0022D9C1 /* FileTreeItemHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeItemHolder.swift; sourceTree = "<group>"; };
 		D70EB6932328A2D20022D9C1 /* FileTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeView.swift; sourceTree = "<group>"; };
 		D70EB6952328B5C60022D9C1 /* String+subscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+subscript.swift"; sourceTree = "<group>"; };
+		D73059672329E26800B8A420 /* Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
 		D7305BB523271F66006668B0 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		D7305BB823271F90006668B0 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		D7305BBA23275402006668B0 /* UIViewController+alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+alert.swift"; sourceTree = "<group>"; };
@@ -150,6 +152,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D73059652329CC0500B8A420 /* SyntaxHighlighters */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = SyntaxHighlighters;
+			sourceTree = "<group>";
+		};
+		D73059662329E25E00B8A420 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				D73059672329E26800B8A420 /* Appearance.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		D7305BB723271F6E006668B0 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
@@ -210,6 +227,8 @@
 		D749DF7523234F830010C673 /* AllCoder */ = {
 			isa = PBXGroup;
 			children = (
+				D73059662329E25E00B8A420 /* Settings */,
+				D73059652329CC0500B8A420 /* SyntaxHighlighters */,
 				D73599DE2328A0C4004D985E /* Protocols */,
 				D7F0614F23236B730019B224 /* Extensions */,
 				D749DFAA232350410010C673 /* HTTP */,
@@ -466,6 +485,7 @@
 				D7F0616B232517060019B224 /* MaterialComment.swift in Sources */,
 				D7F0615B2323ACC70019B224 /* UICollectionViewCell+id.swift in Sources */,
 				D70EB6962328B5C60022D9C1 /* String+subscript.swift in Sources */,
+				D73059682329E26800B8A420 /* Appearance.swift in Sources */,
 				D7F0616F23251D170019B224 /* DescriptionTarget.swift in Sources */,
 				D749DFB62323660E0010C673 /* MaterialSearchViewController.swift in Sources */,
 				D749DFB2232363DA0010C673 /* HomeViewController.swift in Sources */,
