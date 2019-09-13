@@ -18,11 +18,34 @@ class LessonViewController: UIViewController {
         didSet {
             fileTreeView.rootFolder = lesson?.rootFolder
             codeEditorView.file = lesson?.rootFolder?.childFiles.first
+            files.removeAll(keepingCapacity: true)
+            if let rootFolder = lesson?.rootFolder {
+                var folders = [rootFolder]
+                while !folders.isEmpty {
+                    let folder = folders.popLast()!
+                    files.append(contentsOf: folder.childFiles)
+                    folders.append(contentsOf: folder.childFolders)
+                }
+            }
+            releaseDescriptions()
         }
     }
     
+    private var descriptionCollectionViewTopConstraint: NSLayoutConstraint?
+    private var releasedDescriptions = [Description]()
+    private var files = [File]()
     private let fileTreeView = FileTreeView()
     private let codeEditorView = CodeEditorView()
+    private let descriptionCollectionView = UICollectionView(frame: .zero, collectionViewLayout: {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        return layout
+    }())
+    
+    private var descriptionIndex: Int? {
+        let descriptionIndex = Int((descriptionCollectionView.contentOffset.x + (descriptionCollectionView.bounds.width / 2)) / descriptionCollectionView.bounds.width)
+        return (descriptionIndex < releasedDescriptions.count) ? descriptionIndex : nil
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,10 +53,16 @@ class LessonViewController: UIViewController {
         addObservers()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        showDescriptionCollectionView()
+    }
+    
     private func setupViews() {
         view.backgroundColor = .black
         view.addSubview(fileTreeView)
         view.addSubview(codeEditorView)
+        view.addSubview(descriptionCollectionView)
         fileTreeView.backgroundColor = UIColor(red: 48/255, green: 50/255, blue: 61/255, alpha: 1)
         fileTreeView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -50,10 +79,69 @@ class LessonViewController: UIViewController {
             codeEditorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             codeEditorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             ])
+        descriptionCollectionView.dataSource = self
+        descriptionCollectionView.delegate = self
+        descriptionCollectionView.isPagingEnabled = true
+        descriptionCollectionView.bounces = false
+        descriptionCollectionView.register(DescriptionCollectionViewCell.self, forCellWithReuseIdentifier: DescriptionCollectionViewCell.className)
+        descriptionCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        descriptionCollectionViewTopConstraint = descriptionCollectionView.topAnchor.constraint(equalTo: view.bottomAnchor)
+        NSLayoutConstraint.activate([
+            descriptionCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            descriptionCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            descriptionCollectionViewTopConstraint!,
+            descriptionCollectionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.45),
+            ])
     }
     
     private func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(observeFileViewTapNotification(_:)), name: .fileViewTapped, object: nil)
+    }
+    
+    private func releaseDescriptions() {
+        var fileIndex = releasedDescriptions.count
+        while fileIndex < files.count {
+            let file = files[fileIndex]
+            for description in file.descriptions {
+                releasedDescriptions.append(description)
+                return
+            }
+            fileIndex += 1
+        }
+    }
+    
+    private func showDescriptionCollectionView(
+        animationDuration: TimeInterval = UIView.Animation.Duration.normal,
+        completion: ((Bool) -> Void)? = nil
+        ) {
+        descriptionCollectionViewTopConstraint?.constant =
+            -view.safeAreaInsets.bottom - descriptionCollectionView.bounds.height
+        UIView.animate(withDuration: animationDuration, animations: {
+            self.view.layoutIfNeeded()
+            self.codeEditorView.contentSize.height += self.descriptionCollectionView.bounds.height
+        }) { _ in
+            guard let descriptionIndex = self.descriptionIndex else {
+                return
+            }
+            let indexPairs = self.releasedDescriptions[descriptionIndex].targets.map { IndexPair(start: $0.startIndex, end: $0.endIndex) }
+            self.codeEditorView.applyFocus(indexPairs: indexPairs) { finished in
+                completion?(finished)
+            }
+        }
+    }
+    
+    private func hideDescriptionCollectionView(
+        animationDuration: TimeInterval = UIView.Animation.Duration.normal,
+        completion: ((Bool) -> Void)? = nil
+        ) {
+        codeEditorView.cancelFocus(animationDuration: animationDuration) { _ in
+            self.descriptionCollectionViewTopConstraint?.constant = self.view.bounds.height
+            UIView.animate(withDuration: animationDuration, animations: {
+                self.view.layoutIfNeeded()
+            }) { finished in
+                completion?(finished)
+            }
+        }
     }
     
     @objc
@@ -64,24 +152,84 @@ class LessonViewController: UIViewController {
         codeEditorView.file = fileView.file
     }
     
+    @objc
+    private func onTouchUpInsideAnswerButton(_ sender: UIButton) {
+        hideDescriptionCollectionView()
+    }
+    
 }
 
-fileprivate struct Frame {
+extension LessonViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
-    private let borderViews: [UIView]
-    
-    init(_ borderViews: [UIView]) {
-        self.borderViews = borderViews
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        guard let descriptionIndex = descriptionIndex else {
+            return
+        }
+        let indexPairs = releasedDescriptions[descriptionIndex].targets.map({ IndexPair(start: $0.startIndex, end: $0.endIndex) })
+        descriptionCollectionView.isScrollEnabled = false
+        codeEditorView.cancelFocus(animationDuration: UIView.Animation.Duration.fast) { _ in
+            self.codeEditorView.applyFocus(indexPairs: indexPairs) { _ in
+                self.descriptionCollectionView.isScrollEnabled = true
+            }
+        }
     }
     
-    func remove() {
-        borderViews.forEach { $0.removeFromSuperview() }
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return releasedDescriptions.count + 1
     }
     
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DescriptionCollectionViewCell.className, for: indexPath) as! DescriptionCollectionViewCell
+        if indexPath.item == releasedDescriptions.count {
+            cell.mode = .button
+            cell.buttonTitle = "問題を解く"
+            cell.button.addTarget(self, action: #selector(onTouchUpInsideAnswerButton(_:)), for: .touchUpInside)
+        } else {
+            cell.mode = .text
+            cell.data = releasedDescriptions[indexPath.item]
+        }
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return collectionView.bounds.size
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+    
+}
+
+fileprivate struct IndexPair {
+    let start: Int
+    let end: Int
+    init(start: Int, end: Int) {
+        self.start = start
+        self.end = end
+    }
 }
 
 
 fileprivate class CodeEditorView: UIScrollView {
+    
+    private struct Frame {
+        
+        let borderViews: [UIView]
+        
+        init(_ borderViews: [UIView]) {
+            self.borderViews = borderViews
+        }
+        
+        func remove() {
+            borderViews.forEach { $0.removeFromSuperview() }
+        }
+        
+    }
     
     var font = UIFont.boldSmall
     var insets = UIEdgeInsets(
@@ -111,6 +259,7 @@ fileprivate class CodeEditorView: UIScrollView {
     }
     
     private var questionFrames = [Frame]()
+    private var focusFrames = [Frame]()
     private let codeLabel = UILabel()
     
     override init(frame: CGRect) {
@@ -123,10 +272,77 @@ fileprivate class CodeEditorView: UIScrollView {
         setupViews()
     }
     
+    func applyFocus(
+        indexPairs: [IndexPair],
+        animationDuration: TimeInterval = UIView.Animation.Duration.normal,
+        completion: ((Bool) -> Void)? = nil
+        ) {
+        guard let top = indexPairs.sorted(by: { $0.start < $1.start }).first else {
+            return
+        }
+        let size = textSize(upTo: top.start, omittingLastLine: true)
+        UIView.animate(withDuration: animationDuration, animations: {
+            self.contentOffset.y = size.height
+        }) { finished in
+            for indexPair in indexPairs {
+                let frameAnimationCompletion: (Bool) -> Void = { _ in
+                    completion?(finished)
+                }
+                guard let focusFrame =
+                    self.drawFrame(
+                        startIndex: indexPair.start,
+                        endIndex: indexPair.end,
+                        color: .signalRed,
+                        animationDuration: UIView.Animation.Duration.normal,
+                        animationCompletion: frameAnimationCompletion
+                    )
+                    else {
+                        continue
+                }
+                self.focusFrames.append(focusFrame)
+            }
+        }
+    }
+    
+    func cancelFocus(
+        animationDuration: TimeInterval = UIView.Animation.Duration.normal,
+        completion: ((Bool) -> Void)? = nil
+        ) {
+        UIView.animate(withDuration: animationDuration, animations: {
+            self.focusFrames.forEach { $0.borderViews.forEach { $0.alpha = 0} }
+        }) { finished in
+            self.focusFrames.forEach { $0.remove() }
+            self.focusFrames.removeAll(keepingCapacity: true)
+            completion?(finished)
+        }
+    }
+    
     private func setupViews() {
         addSubview(codeLabel)
         codeLabel.numberOfLines = 0
         codeLabel.font = font
+    }
+    
+    private func textSize(upTo index: Int, omittingLastLine: Bool = false) -> CGSize {
+        return textSize(startIndex: 0, endIndex: index, omittingLastLine: omittingLastLine)
+    }
+    
+    private func textSize(startIndex: Int, endIndex: Int, omittingLastLine: Bool = false) -> CGSize {
+        return textSize(file?.text[startIndex..<endIndex], omittingLastLine: omittingLastLine)
+    }
+    
+    private func textSize(_ text: String?, omittingLastLine: Bool = false) -> CGSize {
+        guard let text = text else {
+            return .zero
+        }
+        let attributes = [NSAttributedString.Key.font: self.font]
+        var size = text.size(withAttributes: attributes)
+        let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map { String($0) }
+        size.height += self.lineSpacing * CGFloat(lines.count - 1)
+        if omittingLastLine {
+            size.height -= textSize(lines.last).height
+        }
+        return size
     }
     
     private func setCode() {
@@ -178,7 +394,13 @@ fileprivate class CodeEditorView: UIScrollView {
         )
     }
     
-    private func drawFrame(startIndex: Int, endIndex: Int) -> Frame? {
+    private func drawFrame(
+        startIndex: Int,
+        endIndex: Int,
+        color: UIColor = Appearance.CodeEditor.textColor,
+        animationDuration: TimeInterval? = nil,
+        animationCompletion: ((Bool) -> Void)? = nil
+        ) -> Frame? {
         guard let file = file else {
             return nil
         }
@@ -189,52 +411,34 @@ fileprivate class CodeEditorView: UIScrollView {
             else {
             return nil
         }
-        let size: (String?) -> CGSize = { string in
-            guard let string = string else {
-                return .zero
-            }
-            let attributes = [NSAttributedString.Key.font: self.font]
-            var size = string.size(withAttributes: attributes)
-            let lines = string.split(separator: "\n", omittingEmptySubsequences: false)
-            size.height += self.lineSpacing * CGFloat(lines.count - 1)
-            return size
-        }
-        let lastLineSize = size(lastLine)
         let targetLines = file.text[startIndex..<endIndex].split(separator: "\n").map{ String($0) }
-//        guard let firstLine = targetLines.first else {
-//            return nil
-//        }
         let borderSize = font.pointSize * 0.1
-        let prefixLinesHeight = size(file.text[..<startIndex]).height
-        var borderViews = [UIView]()
-//        //TODO: origin.x -> center.x
-//        var leftX: CGFloat = 0
-//        var rightX: CGFloat = 0
         let horizontalBuffer = insets.left / 2
         let verticalBuffer = lineSpacing / 2
-        var y = prefixLinesHeight - lastLineSize.height - (verticalBuffer / 2)
+        var borderViews = [UIView]()
+        var y = textSize(file.text[..<startIndex], omittingLastLine: true).height - (verticalBuffer / 2)
         for (index, line) in targetLines.enumerated() {
             let makeBorderView = { () -> UIView in
                 let borderView = UIView()
                 self.addSubview(borderView)
                 borderViews.append(borderView)
-                borderView.backgroundColor = Appearance.CodeEditor.textColor
+                borderView.backgroundColor = color
                 return borderView
             }
             let headSpaceRegex = try! NSRegularExpression(pattern: "^ +", options: .anchorsMatchLines)
             var headSpaceWidth: CGFloat = 0
             if let headSpace = headSpaceRegex.matches(in: line, range: NSRange(location: 0, length: NSString(string: line).length)).first {
                 let headSpaces = String(NSString(string: line).substring(with: headSpace.range))
-                headSpaceWidth = size(headSpaces).width
+                headSpaceWidth = textSize(headSpaces).width
             }
-            let lineSize = size(line)
+            let lineSize = textSize(line)
             let leftBorderView = makeBorderView()
             leftBorderView.frame.origin.y = y
             leftBorderView.frame.size.width = borderSize
             leftBorderView.frame.size.height = lineSize.height + verticalBuffer
             leftBorderView.center.x = headSpaceWidth - horizontalBuffer
             if index == 0 {
-                leftBorderView.center.x += lastLineSize.width
+                leftBorderView.center.x += textSize(lastLine).width
             }
             let topBorderView = makeBorderView()
             topBorderView.frame.origin.x = leftBorderView.frame.origin.x
@@ -307,6 +511,14 @@ fileprivate class CodeEditorView: UIScrollView {
             borderView.frame.origin.x += insets.left
             borderView.frame.origin.y += insets.top
         }
+        if let animationDuration = animationDuration {
+            borderViews.forEach { $0.alpha = 0 }
+            UIView.animate(withDuration: animationDuration, animations: {
+                borderViews.forEach { $0.alpha = 1}
+            }) { finished in
+                animationCompletion?(finished)
+            }
+        }
         return Frame(borderViews)
     }
     
@@ -315,11 +527,37 @@ fileprivate class CodeEditorView: UIScrollView {
 
 fileprivate class DescriptionCollectionViewCell: UICollectionViewCell {
     
+    enum Mode {
+        case text
+        case button
+    }
+    
     static let className = "DescriptionCollectionViewCell"
+    
+    let button = UIButton()
     
     var data: Description? {
         didSet {
             textLabel.text = data?.text
+        }
+    }
+    var mode: Mode = .text {
+        didSet {
+            textLabel.isHidden = mode != .text
+            button.isHidden = !textLabel.isHidden
+        }
+    }
+    var buttonTitle: String? {
+        didSet {
+            guard let buttonTitle = buttonTitle else {
+                return
+            }
+            button.setTitle(buttonTitle, for: .normal)
+            let sizeThatFits = button.sizeThatFits
+            button.frame.size.width = sizeThatFits.width * 1.5
+            button.frame.size.height = sizeThatFits.height * 1.5
+            button.frame.origin.x = (bounds.width / 2) - (button.bounds.width / 2)
+            button.frame.origin.y = (bounds.height / 2) - (button.bounds.height / 2)
         }
     }
     
@@ -337,30 +575,19 @@ fileprivate class DescriptionCollectionViewCell: UICollectionViewCell {
     
     private func setupViews() {
         addSubview(textLabel)
+        addSubview(button)
         textLabel.numberOfLines = 0
-        
+        textLabel.font = .boldTiny
+        textLabel.textColor = Appearance.CodeEditor.textColor
+        textLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            textLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            textLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            ])
+        button.isHidden = true
+        button.backgroundColor = .seaGreen
+        button.titleLabel?.font = .boldMedium
+        button.setTitleColor(.white, for: .normal)
     }
     
 }
-
-
-fileprivate class DescriptionView: UIView {
-    
-    var descriptions = [Description]()
-    
-    private let collectionView = UICollectionView()
-    
-}
-
-//extension DescriptionView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-//    
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return descriptions.count
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DescriptionCollectionViewCell.className, for: indexPath)
-//        
-//    }
-//    
-//}
