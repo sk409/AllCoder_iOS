@@ -19,7 +19,7 @@ class FileView: FileTreeItemView {
     func set(file: File) -> CGSize {
         self.file = file
         set(name: file.name)
-        return nameLabel.sizeThatFits
+        return nameLabel.fitSize
     }
     
     private func addGestureRecognizers() {

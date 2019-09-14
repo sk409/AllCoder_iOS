@@ -1,4 +1,4 @@
-struct Description: Decodable {
+class Description: Decodable {
     
     let id: Int
     let index: Int

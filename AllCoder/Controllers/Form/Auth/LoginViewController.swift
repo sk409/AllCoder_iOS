@@ -28,7 +28,7 @@ class LoginViewController: FormViewController {
             x: formViewFrame.origin.x,
             y: formViewFrame.maxY + view.bounds.height * 0.05,
             width: formViewFrame.width,
-            height: loginButton.sizeThatFits.height * 1.2
+            height: loginButton.fitSize.height * 1.2
         ))
         registerButton.titleLabel?.font = .small
         registerButton.setTitle("アカウント作成", for: .normal)
@@ -38,7 +38,7 @@ class LoginViewController: FormViewController {
             x: formViewFrame.origin.x,
             y: loginButton.frame.maxY + view.bounds.height * 0.01,
             width: formViewFrame.width,
-            height: registerButton.sizeThatFits.height * 1.2
+            height: registerButton.fitSize.height * 1.2
         ))
     }
     

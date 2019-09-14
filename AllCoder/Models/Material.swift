@@ -1,4 +1,6 @@
-struct Material: Decodable {
+
+
+class Material: Decodable {
     
     let id: Int
     let title: String

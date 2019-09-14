@@ -1,6 +1,6 @@
 
 
-struct Lesson: Decodable {
+class Lesson: Decodable {
     
     let id: Int
     let title: String

@@ -37,7 +37,7 @@ class FormControlView: UIView {
         case .error:
             feedbackLabel.textColor = .signalRed
         }
-        feedbackLabelHeightConstraint?.constant = max(safeAreaLayoutGuide.layoutFrame.height * 0.1, feedbackLabel.sizeThatFits.height)
+        feedbackLabelHeightConstraint?.constant = max(safeAreaLayoutGuide.layoutFrame.height * 0.1, feedbackLabel.fitSize.height)
         UIView.Animation.normal {
             self.layoutIfNeeded()
         }

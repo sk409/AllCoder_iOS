@@ -1,4 +1,4 @@
-struct Folder: Decodable {
+class Folder: Decodable {
     
     let id: Int
     let name: String

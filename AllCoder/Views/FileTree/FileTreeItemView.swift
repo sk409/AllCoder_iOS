@@ -5,7 +5,7 @@ class FileTreeItemView: UIView {
     let nameLabel = UILabel()
     
     var treeSize: CGSize {
-        return nameLabel.sizeThatFits
+        return nameLabel.fitSize
     }
     
     override init(frame: CGRect) {
@@ -21,7 +21,7 @@ class FileTreeItemView: UIView {
     func set(name: String) {
         nameLabel.text = name
         nameLabel.textColor = .white
-        nameLabel.frame.size = nameLabel.sizeThatFits
+        nameLabel.frame.size = nameLabel.fitSize
     }
     
     private func setupViews() {

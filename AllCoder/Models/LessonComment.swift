@@ -1,4 +1,4 @@
-struct LessonComment: Decodable {
+class LessonComment: Decodable {
     
     let id: Int
     let content: String

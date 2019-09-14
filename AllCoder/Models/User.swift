@@ -1,4 +1,6 @@
-struct User: Decodable {
+
+
+class User: Decodable {
     
     let id: Int
     let name: String

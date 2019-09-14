@@ -1,4 +1,4 @@
-struct MaterialComment: Decodable {
+class MaterialComment: Decodable {
     
     let id: Int
     let content: String

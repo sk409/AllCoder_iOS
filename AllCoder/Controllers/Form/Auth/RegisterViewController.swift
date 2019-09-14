@@ -33,7 +33,7 @@ class RegisterViewController: FormViewController {
             x: formViewFrame.origin.x,
             y: formViewFrame.maxY + view.safeAreaLayoutGuide.layoutFrame.height * 0.05,
             width: formViewFrame.width,
-            height: registerButton.sizeThatFits.height * 1.2
+            height: registerButton.fitSize.height * 1.2
         ))
         haveAccountButton.titleLabel?.font = .small
         haveAccountButton.setTitle("アカウントをお持ちの方", for: .normal)
@@ -43,7 +43,7 @@ class RegisterViewController: FormViewController {
             x: formViewFrame.origin.x,
             y: registerButton.frame.maxY + view.safeAreaLayoutGuide.layoutFrame.height * 0.01,
             width: formViewFrame.width,
-            height: haveAccountButton.sizeThatFits.height * 1.2
+            height: haveAccountButton.fitSize.height * 1.2
         ))
     }
     

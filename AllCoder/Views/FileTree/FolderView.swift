@@ -4,10 +4,10 @@ class FolderView: FileTreeItemView, FileTreeItemHolder {
     
     override var treeSize: CGSize {
         if !isExpanded || children.isEmpty {
-            return nameLabel.sizeThatFits
+            return nameLabel.fitSize
         }
         var width: CGFloat = 0
-        var height: CGFloat = nameLabel.sizeThatFits.height
+        var height: CGFloat = nameLabel.fitSize.height
         for child in children {
             let childTreeSize = child.treeSize
             width = max(width, childTreeSize.width)
@@ -43,7 +43,7 @@ class FolderView: FileTreeItemView, FileTreeItemHolder {
     func set(folder: Folder) -> CGSize {
         self.folder = folder
         set(name: folder.name)
-        var size = nameLabel.sizeThatFits
+        var size = nameLabel.fitSize
         for child in folder.childFolders {
             let childSize = append(child: child)
             size.width = max(size.width, childSize.width + indent)

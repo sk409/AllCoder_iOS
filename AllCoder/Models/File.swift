@@ -1,4 +1,4 @@
-struct File: Decodable {
+class File: Decodable {
     
     let id: Int
     let name: String
