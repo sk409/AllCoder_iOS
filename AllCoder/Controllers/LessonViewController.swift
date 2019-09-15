@@ -57,6 +57,12 @@ class LessonViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        let button = UIButton()
+//        var p = NSMutableParagraphStyle()
+//        p.lineSpacing = 10
+//        button.setAttributedTitle(NSAttributedString(string: ""), for: .normal)
+//        button.titleLabel?.font = .boldSmall
+//        print(button.fitSize)
         setupViews()
         addObservers()
     }
@@ -260,13 +266,14 @@ class LessonViewController: UIViewController {
                     }
                     var counter = [NSAttributedString: Int]()
                     for inputButton in question.inputButtons {
-                        let attributedString = questionAnswer.answer.attributedSubstring(
+                        let mutableAttributedString = NSMutableAttributedString(attributedString: questionAnswer.answer.attributedSubstring(
                             from: NSRange(
                                 location: inputButton.startIndex,
                                 length: inputButton.endIndex - inputButton.startIndex
                             )
-                        )
-                        counter[attributedString] = (counter[attributedString] ?? 0) + 1
+                        ))
+                        mutableAttributedString.removeAttribute(.paragraphStyle, range: mutableAttributedString.string.fullRange)
+                        counter[mutableAttributedString] = (counter[mutableAttributedString] ?? 0) + 1
                     }
                     self.keyboardView.counter = counter
                     self.keyboardView.buttons.forEach { $0.addTarget(self, action: #selector(self.onTouchUpInsideKeyboardButton(_:)), for: .touchUpInside) }
@@ -308,8 +315,8 @@ class LessonViewController: UIViewController {
     }
     
     @objc
-    private func onTouchUpInsideKeyboardButton(_ sender: UIButton) {
-        guard let text = sender.attributedTitle(for: .normal)?.string else {
+    private func onTouchUpInsideKeyboardButton(_ sender: KeyboardButton) {
+        guard let text = sender.text else {
             return
         }
         guard let activeQuestion = activeQuestion else {
@@ -811,7 +818,8 @@ fileprivate class DescriptionCollectionViewCell: UICollectionViewCell {
 
 fileprivate class KeyboardButton: UIButton {
     
-    var count = 0
+    var count: Int?
+    var text: String?
     
 }
 
@@ -822,14 +830,80 @@ fileprivate class KeyboardView: UIScrollView {
             buttons.forEach { $0.removeFromSuperview() }
             buttons.removeAll(keepingCapacity: true)
             counter?.forEach { (attributedString, count) in
+                var backgroundColorHue: CGFloat = 0
+                var backgroundColorSaturation: CGFloat = 0
+                var backgroundColorBrightness: CGFloat = 0
+                var backgroundColorAlpha: CGFloat = 0
+                guard backgroundColor?.getHue(
+                    &backgroundColorHue,
+                    saturation: &backgroundColorSaturation,
+                    brightness: &backgroundColorBrightness,
+                    alpha: &backgroundColorAlpha) ?? false
+                    else {
+                        return
+                }
+                let font = UIFont.boldSmall
                 let button = KeyboardButton()
                 addSubview(button)
                 buttons.append(button)
-                button.setAttributedTitle(attributedString, for: .normal)
+                button.backgroundColor = UIColor(
+                    hue: backgroundColorHue,
+                    saturation: backgroundColorSaturation,
+                    brightness: backgroundColorBrightness / 2,
+                    alpha: backgroundColorAlpha
+                )
+                button.titleLabel?.font = font
+                button.titleLabel?.textAlignment = .center
+                if attributedString.string == "\n" {
+                    button.setTitle(" ", for: .normal)
+                } else {
+                    button.setAttributedTitle(attributedString, for: .normal)
+                }
                 button.count = count
+                button.text = attributedString.string
+                let buttonFitSize = button.fitSize
+                let buttonSize: CGSize
+                let ratio: CGFloat = 1.2
+                if attributedString.string == " " || attributedString.string == "\n" {
+                    buttonSize = CGSize(
+                        width: buttonFitSize.height * ratio,
+                        height: buttonFitSize.height * ratio
+                    )
+                } else {
+                    buttonSize = CGSize(
+                        width: buttonFitSize.width * ratio,
+                        height: buttonFitSize.height * ratio
+                    )
+                }
+                button.frame.size = buttonSize
+                let setButtonImage: (UIImage?, CGSize) -> Void = { image, imageSize in
+                    UIGraphicsBeginImageContextWithOptions(imageSize, false, 0.0)
+                    image?.draw(in: CGRect(x: 0, y: 0, width: imageSize.width, height: imageSize.height))
+                    let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+                    UIGraphicsEndImageContext()
+                    button.setImage(resizedImage, for: .normal)
+                    button.contentEdgeInsets = UIEdgeInsets(
+                        top: (buttonSize.height - imageSize.height) / 2,
+                        left: (buttonSize.width - imageSize.width) / 2,
+                        bottom: (buttonSize.height - imageSize.height) / 2,
+                        right: (buttonSize.width - imageSize.width) / 2
+                    )
+                }
+                if attributedString.string == " " {
+                    setButtonImage(
+                        UIImage(named: "space-icon"),
+                        CGSize(width: buttonSize.width * 0.6, height: buttonSize.width * 0.3)
+                    )
+                } else if attributedString.string == "\n" {
+                    setButtonImage(
+                        UIImage(named: "enter-key-icon"),
+                        CGSize(width: buttonSize.width * 0.6, height: buttonSize.width * 0.3)
+                    )
+                }
             }
         }
     }
+    
     var margin = UIFont.tiny.pointSize
     var insets = UIEdgeInsets(
         top: UIFont.tiny.pointSize / 2,
@@ -846,38 +920,8 @@ fileprivate class KeyboardView: UIScrollView {
     }
     
     private func layoutButtons() {
-        var backgroundColorHue: CGFloat = 0
-        var backgroundColorSaturation: CGFloat = 0
-        var backgroundColorBrightness: CGFloat = 0
-        var backgroundColorAlpha: CGFloat = 0
-        guard backgroundColor?.getHue(
-            &backgroundColorHue,
-            saturation: &backgroundColorSaturation,
-            brightness: &backgroundColorBrightness,
-            alpha: &backgroundColorAlpha) ?? false
-            else {
-            return
-        }
-        var maxWidth: CGFloat = 0
-        for button in buttons {
-            button.backgroundColor = UIColor(
-                hue: backgroundColorHue,
-                saturation: backgroundColorSaturation,
-                brightness: backgroundColorBrightness / 2,
-                alpha: backgroundColorAlpha
-            )
-            button.titleLabel?.font = .boldSmall
-            button.titleLabel?.textAlignment = .center
-            //button.setTitleColor(Appearance.CodeEditor.textColor, for: .normal)
-            let buttonFitSize = button.fitSize
-            let buttonSize = CGSize(
-                width: buttonFitSize.width * 1.2,
-                height: buttonFitSize.height * 1.2
-            )
-            button.frame.size = buttonSize
-            maxWidth = max(maxWidth, buttonSize.width)
-        }
-        contentSize.width = max(bounds.width, maxWidth + insets.left + insets.right)
+        let maxButtonWidth = buttons.reduce(0, { max($0, $1.bounds.width) })
+        contentSize.width = max(bounds.width, maxButtonWidth + insets.left + insets.right)
         var rows: [[UIButton]] = [[]]
         var maxLineHeight: CGFloat = 0
         var pointer = CGPoint(x: insets.left, y: insets.top)
