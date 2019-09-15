@@ -25,7 +25,13 @@ struct HTMLSyntaxHighlighter {
             let attributeRegex = try! NSRegularExpression(
                 pattern: attributes.joined(separator: "|")
             )
-            let attributeMatches = attributeRegex.matches(in: text, range: tagMatch.range)
+            let attributeMatches = attributeRegex.matches(
+                in: text,
+                range: NSRange(
+                    location: tagMatch.range.location + tagNameMatch.range.length,
+                    length: tagMatch.range.length - tagNameMatch.range.length
+                )
+            )
             for attributeMatch in attributeMatches {
                 mutableAttributedString.addAttribute(
                     .foregroundColor,
