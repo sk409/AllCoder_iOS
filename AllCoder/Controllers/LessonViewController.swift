@@ -16,17 +16,22 @@ class LessonViewController: UIViewController {
     
     var lesson: Lesson? {
         didSet {
-            describedFiles.removeAll(keepingCapacity: true)
+            codeEditorViews.removeAll(keepingCapacity: true)
             releasedDescriptions.removeAll(keepingCapacity: true)
             questions.removeAll(keepingCapacity: true)
             focusFrames.removeAll(keepingCapacity: true)
             fileTreeView.rootFolder = lesson?.rootFolder
-            codeEditorView.set(file: lesson?.rootFolder?.childFiles.first)
+            //codeEditorView.set(file: lesson?.rootFolder?.childFiles.first)
             if let rootFolder = lesson?.rootFolder {
                 var folders = [rootFolder]
                 while !folders.isEmpty {
                     let folder = folders.popLast()!
-                    describedFiles.append(contentsOf: folder.childFiles.filter { $0.index != nil })
+                    let describedFiles = folder.childFiles.filter { $0.index != nil }
+                    codeEditorViews.append(contentsOf: describedFiles.map { describedFile in
+                        let codeEditorView = CodeEditorView()
+                        codeEditorView.set(file: describedFile)
+                        return codeEditorView
+                    })
                     folders.append(contentsOf: folder.childFolders)
                 }
             }
@@ -36,13 +41,14 @@ class LessonViewController: UIViewController {
     
     private var keyboardViewTrailingConstraint: NSLayoutConstraint?
     private var descriptionCollectionViewTopConstraint: NSLayoutConstraint?
-    private var describedFiles = [File]()
+    //private var describedFiles = [File]()
+    private var codeEditorViews = [CodeEditorView]()
     private var releasedDescriptions = [Description]()
     private var activeQuestion: Question?
     private var questions = [Question]()
     private var focusFrames = [Frame]()
     private let fileTreeView = FileTreeView()
-    private let codeEditorView = CodeEditorView()
+    //private let codeEditorView = CodeEditorView()
     private let keyboardView = KeyboardView()
     private let descriptionCollectionView = UICollectionView(frame: .zero, collectionViewLayout: {
         let layout = UICollectionViewFlowLayout()
@@ -53,6 +59,17 @@ class LessonViewController: UIViewController {
     private var descriptionIndex: Int? {
         let descriptionIndex = Int((descriptionCollectionView.contentOffset.x + (descriptionCollectionView.bounds.width / 2)) / descriptionCollectionView.bounds.width)
         return (descriptionIndex < releasedDescriptions.count) ? descriptionIndex : nil
+    }
+    
+    private var codeEditorView: CodeEditorView? {
+        let descriptionIndex = self.descriptionIndex ?? (releasedDescriptions.count - 1)
+        let description = releasedDescriptions[descriptionIndex]
+        return codeEditorViews.first { codeEditorView in
+            guard let file = codeEditorView.file else {
+                return false
+            }
+            return file.id == description.fileId
+        }
     }
     
     override func viewDidLoad() {
@@ -70,13 +87,14 @@ class LessonViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         showDescriptionCollectionView()
-        codeEditorView.contentSize.height += descriptionCollectionView.bounds.height
+        codeEditorView?.alpha = 1
+        codeEditorViews.forEach { $0.contentSize.height += descriptionCollectionView.bounds.height }
     }
     
     private func setupViews() {
         view.backgroundColor = .black
         view.addSubview(fileTreeView)
-        view.addSubview(codeEditorView)
+        codeEditorViews.forEach { view.addSubview($0) }
         view.addSubview(keyboardView)
         view.addSubview(descriptionCollectionView)
         fileTreeView.backgroundColor = UIColor(red: 48/255, green: 50/255, blue: 61/255, alpha: 1)
@@ -87,15 +105,17 @@ class LessonViewController: UIViewController {
             fileTreeView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             fileTreeView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.3)
             ])
-        codeEditorView.backgroundColor = .black
-        codeEditorView.showCaret()
-        codeEditorView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            codeEditorView.leadingAnchor.constraint(equalTo: fileTreeView.trailingAnchor),
-            codeEditorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            codeEditorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            codeEditorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            ])
+        for codeEditorView in codeEditorViews {
+            codeEditorView.alpha = 0
+            codeEditorView.backgroundColor = .black
+            codeEditorView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                codeEditorView.leadingAnchor.constraint(equalTo: fileTreeView.trailingAnchor),
+                codeEditorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+                codeEditorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                codeEditorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+                ])
+        }
         keyboardView.backgroundColor = UIColor(red: 50/255, green: 50/255, blue: 50/255, alpha: 1)
         keyboardViewTrailingConstraint = keyboardView.trailingAnchor.constraint(equalTo: view.leadingAnchor)
         keyboardView.translatesAutoresizingMaskIntoConstraints = false
@@ -128,6 +148,7 @@ class LessonViewController: UIViewController {
         var found = false
         var fileIndex = 0
         var descriptionCounter = 0
+        let describedFiles = codeEditorViews.compactMap { $0.file }
         for (index, file) in describedFiles.enumerated() {
             fileIndex = index
             descriptionCounter += file.descriptions.count
@@ -155,6 +176,20 @@ class LessonViewController: UIViewController {
         }
     }
     
+    private func changeCodeEditorView(fileId: Int? = nil) {
+        let fileId = fileId ??
+                     releasedDescriptions[
+                        descriptionIndex ?? (releasedDescriptions.count - 1)
+                        ].fileId
+        codeEditorViews.forEach { $0.alpha = 0 }
+        codeEditorViews.first { codeEditorView in
+            guard let file = codeEditorView.file else {
+                return false
+            }
+            return file.id == fileId
+        }?.alpha = 1
+    }
+    
     private func focusDescriptionTargets(
         animationDuration: TimeInterval = UIView.Animation.Duration.normal,
         completion: ((Bool) -> Void)? = nil
@@ -166,7 +201,7 @@ class LessonViewController: UIViewController {
         }
         let focus = {
             for target in self.releasedDescriptions[descriptionIndex].targets {
-                guard let frame = self.codeEditorView.addFrame(
+                guard let frame = self.codeEditorView?.addFrame(
                     startIndex: target.startIndex,
                     endIndex: target.endIndex,
                     color: .signalRed)
@@ -179,7 +214,7 @@ class LessonViewController: UIViewController {
             self.focusFrames.forEach { $0.borderViews.forEach { $0.alpha = 0 } }
             if let topIndex = self.releasedDescriptions[descriptionIndex].targets.first?.startIndex
             {
-                self.codeEditorView.scroll(to: topIndex, animationDuration: animationDuration)
+                self.codeEditorView?.scroll(to: topIndex, animationDuration: animationDuration)
                 { finished in
                     UIView.animate(withDuration: animationDuration, animations: {
                         self.focusFrames.forEach { $0.borderViews.forEach { $0.alpha = 1 }}
@@ -239,7 +274,7 @@ class LessonViewController: UIViewController {
             guard let activeQuestion = self.activeQuestion else {
                 return
             }
-            self.codeEditorView.deactivateQuestion(id: activeQuestion.id)
+            self.codeEditorView?.deactivateQuestion(id: activeQuestion.id)
             self.activeQuestion = nil
         }
         if questions.isEmpty {
@@ -248,7 +283,9 @@ class LessonViewController: UIViewController {
                 self.view.layoutIfNeeded()
                 deactivateActiveQuestion()
             }) { _ in
+                self.codeEditorView?.hideCaret()
                 self.releaseDescriptions()
+                self.changeCodeEditorView()
                 self.descriptionCollectionView.reloadData()
                 UIView.Animation.fast {
                     self.showDescriptionCollectionView()
@@ -260,13 +297,13 @@ class LessonViewController: UIViewController {
                 return
             }
             let activateNextQuestion = {
-                self.codeEditorView.scroll(
+                self.codeEditorView?.scroll(
                     to: firstInputButton.startIndex,
                     animationDuration: UIView.Animation.Duration.fast
                 ) { _ in
                     var counter = [NSAttributedString: Int]()
                     for inputButton in question.inputButtons {
-                        guard let attributedSubtext = self.codeEditorView.attributedSubtext(
+                        guard let attributedSubtext = self.codeEditorView?.attributedSubtext(
                             from: NSRange(
                                 location: inputButton.startIndex,
                                 length: inputButton.endIndex - inputButton.startIndex
@@ -284,12 +321,13 @@ class LessonViewController: UIViewController {
                     self.keyboardViewTrailingConstraint?.constant = self.keyboardView.bounds.width + self.view.safeAreaInsets.left
                     UIView.Animation.fast {
                         self.view.layoutIfNeeded()
-                        self.codeEditorView.activateQuestion(id: question.id)
+                        self.codeEditorView?.activateQuestion(id: question.id)
                     }
                 }
             }
             if activeQuestion == nil {
                 activateNextQuestion()
+                codeEditorView?.showCaret()
             } else {
                 UIView.Animation.fast(animations: {
                     deactivateActiveQuestion()
@@ -306,7 +344,7 @@ class LessonViewController: UIViewController {
         guard let fileView = sender.userInfo?[FileView.userInfoKey] as? FileView else {
             return
         }
-        codeEditorView.set(file: fileView.file)
+        //codeEditorView?.set(file: fileView.file)
     }
     
     @objc
@@ -324,6 +362,9 @@ class LessonViewController: UIViewController {
         guard let activeQuestion = activeQuestion else {
             return
         }
+        guard let codeEditorView = codeEditorView else {
+            return
+        }
         guard codeEditorView.isCorrect(text: text) else {
             return
         }
@@ -338,6 +379,7 @@ class LessonViewController: UIViewController {
 extension LessonViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        changeCodeEditorView()
         descriptionCollectionView.isScrollEnabled = false
         focusDescriptionTargets(animationDuration: UIView.Animation.Duration.fast) { _ in
             self.descriptionCollectionView.isScrollEnabled = true
@@ -464,11 +506,11 @@ fileprivate class CodeEditorView: UIScrollView {
         return font.pointSize * 0.1
     }
     
-    private(set) var questionAnswers = [QuestionAnswer]()
+    private(set) var file: File?
     
-    private var file: File?
     private var syntaxHighlightedText: NSAttributedString?
     private var questionFrames = [QuestionFrame]()
+    private var questionAnswers = [QuestionAnswer]()
     private let codeLabel = UILabel()
     private let caretView = CaretView()
     
@@ -1065,6 +1107,7 @@ fileprivate class CaretView: UIView {
     
     func show() {
         hide()
+        isHidden = false
         timer = Timer.scheduledTimer(
             withTimeInterval: timeInterval,
             repeats: true
@@ -1074,6 +1117,7 @@ fileprivate class CaretView: UIView {
     }
     
     func hide() {
+        isHidden = true
         timer?.invalidate()
     }
     
