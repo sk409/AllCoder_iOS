@@ -87,6 +87,10 @@ class HomeViewController: UIViewController {
                 self.present(lessonViewController, animated: true)
             }
             self.curtainView.contentView = materialDetailsView
+            //self.curtainView.frame.origin.x = self.view.safeAreaInsets.left
+            self.curtainView.frame.origin.y = self.view.safeAreaInsets.top
+            self.curtainView.frame.size.width = self.view.safeAreaLayoutGuide.layoutFrame.width
+            self.curtainView.frame.size.height = self.view.safeAreaLayoutGuide.layoutFrame.height
             self.curtainView.slideIn()
         }
 //        purchasedMaterialsTableView.detailsButtonHandler = { material in
@@ -424,7 +428,9 @@ fileprivate class PurchasedMaterialsTableView: UITableView, UITableViewDataSourc
         let material = materials[indexPath.row]
         let lessonCount = material.lessons.count
         let lessonCompletionCount = lessonCompletions.filter { $0.materialId == material.id }.count
-        cell.selectedBackgroundView = nil
+//        let selectedView = UIView()
+//        selectedView.backgroundColor = .clear
+//        cell.selectedBackgroundView = selectedView
         cell.material = material
 //        cell.detailsButton.indexPath = indexPath
 //        cell.detailsButton.addTarget(self, action: #selector(onTouchUpInsideDetailsButton(_:)), for: .touchUpInside)
