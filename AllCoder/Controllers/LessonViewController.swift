@@ -341,10 +341,10 @@ class LessonViewController: UIViewController {
     
     @objc
     private func observeTapFileViewNotification(_ sender: Notification) {
-        guard let fileView = sender.userInfo?[FileView.userInfoKey] as? FileView else {
+        guard let file = (sender.userInfo?[FileView.userInfoKey] as? FileView)?.file else {
             return
         }
-        //codeEditorView?.set(file: fileView.file)
+        changeCodeEditorView(fileId: file.id)
     }
     
     @objc

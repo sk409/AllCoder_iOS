@@ -4,8 +4,9 @@ class MaterialSearchViewController: UIViewController {
     
     var user: User?
     
-    private var materialPurchaseViewLeadingConstraint: NSLayoutConstraint?
-    private let panGestureRecognizer = UIPanGestureRecognizer()
+    //private var materialPurchaseViewLeadingConstraint: NSLayoutConstraint?
+    //private let panGestureRecognizer = UIPanGestureRecognizer()
+    private let curtainView = CurtainView()
     private let materialPurchaseView = MaterialPurchaseView()
     private let materialsScrollView = MaterialsScrollView()
     private let materialPurchaseConfirmationAlertView = MaterialPurchaseConfirmationAlertView()
@@ -14,7 +15,7 @@ class MaterialSearchViewController: UIViewController {
         super.viewDidLoad()
         fetchMaterials()
         setupViews()
-        setupGestureRecognizers()
+        //setupGestureRecognizers()
     }
     
     private func setupViews() {
@@ -22,7 +23,7 @@ class MaterialSearchViewController: UIViewController {
         let headerView = UIView()
         view.addSubview(headerView)
         view.addSubview(materialsScrollView)
-        view.addSubview(materialPurchaseView)
+        view.addSubview(curtainView)
         headerView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -40,15 +41,17 @@ class MaterialSearchViewController: UIViewController {
             materialsScrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             materialsScrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             ])
+        curtainView.contentView = materialPurchaseView
+        curtainView.panGestureRecognizer.delegate = self
         materialPurchaseView.purchaseButton.addTarget(self, action: #selector(onTouchUpInsidePurchaseButton(_:)), for: .touchUpInside)
-        materialPurchaseView.translatesAutoresizingMaskIntoConstraints = false
-        materialPurchaseViewLeadingConstraint = materialPurchaseView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: view.bounds.width)
-        NSLayoutConstraint.activate([
-            materialPurchaseViewLeadingConstraint!,
-            materialPurchaseView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            materialPurchaseView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            materialPurchaseView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
-            ])
+//        materialPurchaseView.translatesAutoresizingMaskIntoConstraints = false
+//        materialPurchaseViewLeadingConstraint = materialPurchaseView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: view.bounds.width)
+//        NSLayoutConstraint.activate([
+//            materialPurchaseViewLeadingConstraint!,
+//            materialPurchaseView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+//            materialPurchaseView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+//            materialPurchaseView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
+//            ])
         let materialPurchaseConfirmationAlertViewWidth = UIScreen.main.bounds.width * 0.8
         let materialPurchaseConfirmationAlertViewHeight = materialPurchaseConfirmationAlertViewWidth * 1.41421356
         materialPurchaseConfirmationAlertView.frame.size = CGSize(
@@ -61,10 +64,10 @@ class MaterialSearchViewController: UIViewController {
         materialPurchaseConfirmationAlertView.downloadButton.addTarget(self, action: #selector(onTouchUpInsideDownloadMaterialButton(_:)), for: .touchUpInside)
     }
     
-    private func setupGestureRecognizers() {
-        panGestureRecognizer.addTarget(self, action: #selector(handlePanGesture(_:)))
-        panGestureRecognizer.delegate = self
-    }
+//    private func setupGestureRecognizers() {
+//        panGestureRecognizer.addTarget(self, action: #selector(handlePanGesture(_:)))
+//        panGestureRecognizer.delegate = self
+//    }
     
     private func fetchMaterials() {
         let http = HTTP()
@@ -89,12 +92,13 @@ class MaterialSearchViewController: UIViewController {
         guard let materialCardView = sender.view as? MaterialCardView else {
             return
         }
-        view.addGestureRecognizer(panGestureRecognizer)
+        //view.addGestureRecognizer(panGestureRecognizer)
         materialPurchaseView.material = materialCardView.material
-        materialPurchaseViewLeadingConstraint?.constant = 0
-        UIView.Animation.fast {
-            self.view.layoutIfNeeded()
-        }
+        curtainView.slideIn()
+//        materialPurchaseViewLeadingConstraint?.constant = 0
+//        UIView.Animation.fast {
+//            self.view.layoutIfNeeded()
+//        }
     }
     
     @objc
@@ -125,7 +129,9 @@ class MaterialSearchViewController: UIViewController {
             URLQueryItem(name: "material_id", value: String(material.id))
         ]
         HTTP().async(path: "api/materials/purchase", method: .post, parameters: parameters) { response in
-            // TODO: 購入後の処理
+            DispatchQueue.main.async {
+                self.tabBarController?.selectedIndex = 0
+            }
         }
 //        let parameters = [
 //            URLQueryItem(name: "id", value: String(material.id)),
@@ -138,47 +144,49 @@ class MaterialSearchViewController: UIViewController {
 //        }
     }
     
-    @objc
-    private func handlePanGesture(_ sender: UIPanGestureRecognizer) {
-        guard let materialPurchaseViewLeadingConstraint = materialPurchaseViewLeadingConstraint else {
-            return
-        }
-        let hideMaterialPurchaseView = {
-            materialPurchaseViewLeadingConstraint.constant = self.view.bounds.width
-            self.view.removeGestureRecognizer(self.panGestureRecognizer)
-            UIView.Animation.fast {
-                self.view.layoutIfNeeded()
-            }
-        }
-        let constant = materialPurchaseViewLeadingConstraint.constant
-        if sender.state == .changed {
-            let velocity = panGestureRecognizer.velocity(in: view)
-            if 3000 <= velocity.x {
-                hideMaterialPurchaseView()
-            } else {
-                materialPurchaseViewLeadingConstraint.constant = min(view.bounds.width, max(0, constant + (velocity.x * 0.015)))
-            }
-        } else if sender.state == .ended {
-            if (view.bounds.width * 0.5) < constant {
-                hideMaterialPurchaseView()
-            } else {
-                materialPurchaseViewLeadingConstraint.constant = 0
-                UIView.Animation.fast {
-                    self.view.layoutIfNeeded()
-                }
-            }
-        }
-    }
+//    @objc
+//    private func handlePanGesture(_ sender: UIPanGestureRecognizer) {
+//        guard let materialPurchaseViewLeadingConstraint = materialPurchaseViewLeadingConstraint else {
+//            return
+//        }
+//        let hideMaterialPurchaseView = {
+//            materialPurchaseViewLeadingConstraint.constant = self.view.bounds.width
+//            self.view.removeGestureRecognizer(self.panGestureRecognizer)
+//            UIView.Animation.fast {
+//                self.view.layoutIfNeeded()
+//            }
+//        }
+//        let constant = materialPurchaseViewLeadingConstraint.constant
+//        if sender.state == .changed {
+//            let velocity = panGestureRecognizer.velocity(in: view)
+//            if 3000 <= velocity.x {
+//                hideMaterialPurchaseView()
+//            } else {
+//                materialPurchaseViewLeadingConstraint.constant = min(view.bounds.width, max(0, constant + (velocity.x * 0.015)))
+//            }
+//        } else if sender.state == .ended {
+//            if (view.bounds.width * 0.5) < constant {
+//                hideMaterialPurchaseView()
+//            } else {
+//                materialPurchaseViewLeadingConstraint.constant = 0
+//                UIView.Animation.fast {
+//                    self.view.layoutIfNeeded()
+//                }
+//            }
+//        }
+//    }
     
 }
 
 extension MaterialSearchViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard gestureRecognizer === panGestureRecognizer else {
+        guard gestureRecognizer === curtainView.panGestureRecognizer else {
             return false
         }
-        let velocity = panGestureRecognizer.velocity(in: view)
+        let velocity = curtainView.panGestureRecognizer.velocity(in: view)
+        print(materialPurchaseView.tabBarView.contentCollectionView.contentOffset.x == 0 &&
+            velocity.y < velocity.x)
         return materialPurchaseView.tabBarView.contentCollectionView.contentOffset.x == 0 &&
                velocity.y < velocity.x
     }
@@ -577,25 +585,25 @@ fileprivate class MaterialPurchaseView: UIView {
 //
 //}
 
-fileprivate class LessonsTableView: UITableView {
-    
-    var lessons = [Lesson]() {
-        didSet {
-            reloadData()
-        }
-    }
-    
-    override func numberOfRows(inSection section: Int) -> Int {
-        return lessons.count
-    }
-    
-    override func cellForRow(at indexPath: IndexPath) -> UITableViewCell? {
-        let cell = UITableViewCell()
-        cell.textLabel?.text = lessons[indexPath.row].title
-        return cell
-    }
-    
-}
+//fileprivate class LessonsTableView: UITableView {
+//
+//    var lessons = [Lesson]() {
+//        didSet {
+//            reloadData()
+//        }
+//    }
+//
+//    override func numberOfRows(inSection section: Int) -> Int {
+//        return lessons.count
+//    }
+//
+//    override func cellForRow(at indexPath: IndexPath) -> UITableViewCell? {
+//        let cell = UITableViewCell()
+//        cell.textLabel?.text = lessons[indexPath.row].title
+//        return cell
+//    }
+//
+//}
 
 //fileprivate class MaterialCommentView: UIView {
 //

@@ -2,9 +2,17 @@ import UIKit
 
 class DashboardTabBarController: UITabBarController {
     
+    override var shouldAutorotate: Bool {
+        return true
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return [.portrait, .portraitUpsideDown]
+    }
+    
     var user: User? {
         didSet {
-            homeViewController.user = user
+            homeViewController.userId = user?.id
             materialSearchViewController.user = user
         }
     }
@@ -15,17 +23,6 @@ class DashboardTabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//        HTTP().async(route: .init(resource: .materials, name: .index, options: [.api])) { response in
-//            //print(String(data: response, encoding: .utf8))
-//            let jsonDecoder = JSONDecoder()
-//            jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-//            print(try! jsonDecoder.decode([Material].self, from: response))
-//        }
-        
-        
-        
-        
         homeViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .featured, tag: 0)
         materialSearchViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 1)
         messagesViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 2)

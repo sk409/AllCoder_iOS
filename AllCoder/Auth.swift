@@ -74,7 +74,7 @@ class Auth {
         semaphore.wait()
     }
     
-    private func fetchUser(completion: ((User?) -> Void)? = nil) {
+    func fetchUser(completion: ((User?) -> Void)? = nil) {
         guard let userId = UserDefaults.standard.value(forKey: Auth.userIdKey) as? Int else {
             completion?(nil)
             return

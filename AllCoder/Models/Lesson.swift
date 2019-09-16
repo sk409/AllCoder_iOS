@@ -3,6 +3,7 @@
 class Lesson: Decodable {
     
     let id: Int
+    let index: Int
     let title: String
     let description: String
     let createdAt: String
