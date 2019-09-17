@@ -31,6 +31,8 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>Privacy – Photo Library Usage Description</key>
+	<string>プロフィール画像の設定に使用します。</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

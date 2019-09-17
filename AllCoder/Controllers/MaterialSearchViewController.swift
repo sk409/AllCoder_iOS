@@ -103,7 +103,7 @@ class MaterialSearchViewController: UIViewController {
     
     @objc
     private func onTouchUpInsidePurchaseButton(_ sender: UIButton) {
-        addBlackout()
+        _ = addBlackout()
         view.addSubview(materialPurchaseConfirmationAlertView)
         materialPurchaseConfirmationAlertView.material = materialPurchaseView.material
         materialPurchaseConfirmationAlertView.show()
@@ -185,8 +185,6 @@ extension MaterialSearchViewController: UIGestureRecognizerDelegate {
             return false
         }
         let velocity = curtainView.panGestureRecognizer.velocity(in: view)
-        print(materialPurchaseView.tabBarView.contentCollectionView.contentOffset.x == 0 &&
-            velocity.y < velocity.x)
         return materialPurchaseView.tabBarView.contentCollectionView.contentOffset.x == 0 &&
                velocity.y < velocity.x
     }
@@ -236,6 +234,7 @@ fileprivate class MaterialCardView: UIView {
             guard let material = material else {
                 return
             }
+            thumbnailImageView.fetch(path: material.thumbnailImagePath)
             titleLabel.text = material.title
             priceLabel.text = Price(locale: .japan, value: material.price).string
             numberOfLessonsLabel.text = "全" + String(material.lessons.count) + "レッスン"
@@ -278,7 +277,6 @@ fileprivate class MaterialCardView: UIView {
             leftView.bottomAnchor.constraint(equalTo: separatorView.topAnchor),
             leftView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.4),
             ])
-        thumbnailImageView.backgroundColor = .orange
         thumbnailImageView.contentMode = .scaleAspectFit
         thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -616,6 +614,7 @@ fileprivate class MaterialMediaView: UIView {
             guard let material = material else {
                 return
             }
+            thumbnailImageView.fetch(path: material.thumbnailImagePath)
             commentViews.forEach { $0.removeFromSuperview() }
             commentViews.removeAll(keepingCapacity: true)
             titleLabel.text = material.title
@@ -688,14 +687,13 @@ fileprivate class MaterialMediaView: UIView {
             profileLeftView.widthAnchor.constraint(equalTo: profileView.safeAreaLayoutGuide.widthAnchor, multiplier: 0.3),
             profileLeftView.heightAnchor.constraint(equalTo: profileView.safeAreaLayoutGuide.heightAnchor, multiplier: 0.8)
             ])
-        thumbnailImageView.backgroundColor = .orange
         thumbnailImageView.contentMode = .scaleAspectFit
         thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             thumbnailImageView.trailingAnchor.constraint(equalTo: profileLeftView.trailingAnchor),
             thumbnailImageView.topAnchor.constraint(equalTo: profileLeftView.safeAreaLayoutGuide.topAnchor),
             thumbnailImageView.bottomAnchor.constraint(equalTo: profileLeftView.safeAreaLayoutGuide.bottomAnchor),
-            thumbnailImageView.widthAnchor.constraint(equalTo: thumbnailImageView.heightAnchor),
+            thumbnailImageView.widthAnchor.constraint(equalTo: profileLeftView.safeAreaLayoutGuide.widthAnchor, multiplier: 0.8),
             ])
         profileRightView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([

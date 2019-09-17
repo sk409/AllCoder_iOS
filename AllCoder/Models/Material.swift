@@ -6,7 +6,7 @@ class Material: Decodable {
     let title: String
     let description: String
     let price: Int
-    //let thumbnailImage: String?
+    let thumbnailImagePath: String?
     let createdAt: String
     let updatedAt: String
     let lessons: [Lesson]

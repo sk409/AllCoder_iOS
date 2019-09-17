@@ -9,6 +9,10 @@ struct HTTP {
         case delete
     }
     
+    enum FileUsage: String {
+        case userProfileImage
+    }
+    
     struct Route {
         
         enum API: String {
@@ -91,9 +95,11 @@ struct HTTP {
         
     }
     
+    static let defaultOrigin = URL(string: "http://localhost:8000")!
+    
     let origin: URL
     
-    init(origin: URL = URL(string: "http://localhost:8000")!) {
+    init(origin: URL = HTTP.defaultOrigin) {
         self.origin = origin
     }
     
@@ -152,6 +158,98 @@ struct HTTP {
             return
         }
         async(path: path, method: route.method, parameters: parameters, completion: completion)
+    }
+    
+    func upload(_ fileName: String, fileData: Data, fileUsage: FileUsage, completion: ((Data?) -> Void)? = nil) {
+        let pathExtension = (fileName as NSString).pathExtension
+        let boundary = "----WebKitFormBoundaryZLdHZy8HNaBmUX0d"
+        var body = "--\(boundary)\r\n".data(using: .utf8)!
+        body += "Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\r\n".data(using: .utf8)!
+        body += "Content-Type: image/\(pathExtension)\r\n\r\n".data(using: .utf8)!
+        body += fileData
+        body += "\r\n".data(using: .utf8)!
+        body += "--\(boundary)\r\n".data(using: .utf8)!
+        body += "Content-Disposition: form-data; name=\"file_usage\"\r\n\r\n".data(using: .utf8)!
+        body += "\(fileUsage.rawValue)\r\n".data(using: .utf8)!
+        body += "--\(boundary)\r\n".data(using: .utf8)!
+        body += "Content-Disposition: form-data; name=\"user_id\"\r\n\r\n".data(using: .utf8)!
+        switch fileUsage {
+        case .userProfileImage:
+            if let userId = Auth.shared.user?.id {
+                body += String(userId).data(using: .utf8)!
+            }
+        }
+        let url = origin.appendingPathComponent("api").appendingPathComponent("upload")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        let headers = ["Content-Type": "multipart/form-data; boundary=\(boundary)"]
+        let urlConfig = URLSessionConfiguration.default
+        urlConfig.httpAdditionalHeaders = headers
+        let session = URLSession(configuration: urlConfig)
+        let task = session.uploadTask(with: request, from: body) { data, response, error in
+            completion?(data)
+        }
+        task.resume()
+//        func upload() {
+////            let fileName = "menu-button.png"
+////            let fileNameWithoutExt = (fileName as NSString).deletingPathExtension
+////            //        let ext = (fileName as NSString).pathExtension
+////            // UIImageからJPEGに変換してアップロード
+////            //let imageData = UIImageJPEGRepresentation(UIImage(named: fileName)!, 1.0)!
+////            // 読み込んだJPEGファイルをそのままアップロード
+////            let imageData = UIImage(named: fileNameWithoutExt)!.pngData()!
+//            //let body = httpBody(imageData, fileName: fileName)
+//            let url = URL(string: "http://localhost:8000/api/upload")!
+//
+//            fileUpload(url, data: body) {(data, response, error) in
+//                if let response = response as? HTTPURLResponse, let data: Data = data , error == nil {
+//                    if response.statusCode == 200 {
+//                        print("Upload done")
+//                        print(String(data: data, encoding: .utf8))
+//                    } else {
+//                        print(response.statusCode)
+//                    }
+//                }
+//            }
+//        }
+//
+//        func httpBody(_ fileAsData: Data, fileName: String) -> Data {
+////            var data = "--\(boundary)\r\n".data(using: .utf8)!
+////            data += "Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\r\n".data(using: .utf8)!
+////            data += "Content-Type: image/png\r\n\r\n".data(using: .utf8)!
+////            data += fileAsData
+////            data += "\r\n".data(using: .utf8)!
+////            data += "--\(boundary)\r\n".data(using: .utf8)!
+////            data += "Content-Disposition: form-data; name=\"file_usage\"\r\n\r\n".data(using: .utf8)!
+////            data += "userProfileImage\r\n".data(using: .utf8)!
+////            data += "--\(boundary)\r\n".data(using: .utf8)!
+////            data += "Content-Disposition: form-data; name=\"user_id\"\r\n\r\n".data(using: .utf8)!
+////            data += "1".data(using: .utf8)!
+//            //data += "\r\n".data(using: .utf8)!
+//            //        data += "--\(boundary)\r\n".data(using: .utf8)!
+//            //        data += "\r\n".data(using: .utf8)!
+//            //        data += "--\(boundary)--\r\n".data(using: .utf8)!
+//            //        data += "Content-Disposition: form-data; name=\"user_id\"\r\n\r\n".data(using: .utf8)!
+//            //        data += "341".data(using: .utf8)!
+//
+//            //print(String(data: data, encoding: .utf8))
+//
+//            return data
+//        }
+        
+//        // リクエストを生成してアップロード
+//        func fileUpload(_ url: URL, data: Data, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) {
+//            var request = URLRequest(url: url)
+//            request.httpMethod = "POST"
+//            // マルチパートでファイルアップロード
+//            let headers = ["Content-Type": "multipart/form-data; boundary=\(boundary)"]
+//            let urlConfig = URLSessionConfiguration.default
+//            urlConfig.httpAdditionalHeaders = headers
+//
+//            let session = Foundation.URLSession(configuration: urlConfig)
+//            let task = session.uploadTask(with: request, from: data, completionHandler: completionHandler)
+//            task.resume()
+//        }
     }
     
     

@@ -1,3 +1,4 @@
+import Photos
 import UIKit
 
 class HomeViewController: UIViewController {
@@ -5,9 +6,13 @@ class HomeViewController: UIViewController {
     var userId: Int?
     
     private var user: User?
+    private var profileViewTrailingConstraint: NSLayoutConstraint?
+    private let tabBarView = TabBarView()
     private let purchasedMaterialsTableView = PurchasedMaterialsTableView()
     private let curtainView = CurtainView()
     private let createdMaterialsTableView = UITableView()
+    private let profileImageButton = UIButton()
+    private let profileView = UserProfileView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,8 +40,18 @@ class HomeViewController: UIViewController {
             self.user = (try? jsonDecoder.decode([User].self, from: response))?.first
             self.purchasedMaterialsTableView.materials = self.user?.purchasedMaterials
             self.purchasedMaterialsTableView.lessonCompletions = self.user?.lessonCompletions
+            var profileImage: UIImage?
+            if let profileImagePath = self.user?.profileImagePath,
+                let profileImageData = try? Data(contentsOf: HTTP.defaultOrigin.appendingPathComponent(profileImagePath))
+            {
+                profileImage = UIImage(data: profileImageData)
+            } else {
+                profileImage = UIImage(named: "no-image")
+            }
             DispatchQueue.main.async {
                 self.purchasedMaterialsTableView.reloadData()
+                self.profileImageButton.setImage(profileImage, for: .normal)
+                self.profileView.profileImageView.image = profileImage
             }
         }
     }
@@ -67,16 +82,17 @@ class HomeViewController: UIViewController {
 //    }
     
     private func setupViews() {
-        let tabBarView = TabBarView()
         view.addSubview(tabBarView)
         view.addSubview(curtainView)
+        view.addSubview(profileImageButton)
+        view.addSubview(profileView)
         tabBarView.set(contentViews: ["購入した教材": purchasedMaterialsTableView, "作成した教材": createdMaterialsTableView])
         tabBarView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tabBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            tabBarView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            tabBarView.leadingAnchor.constraint(equalTo: profileView.trailingAnchor),
             tabBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tabBarView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            tabBarView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
             ])
         purchasedMaterialsTableView.onSelectCell = { material in
             let materialDetailsView = MaterialDetailsView()
@@ -87,74 +103,120 @@ class HomeViewController: UIViewController {
                 self.present(lessonViewController, animated: true)
             }
             self.curtainView.contentView = materialDetailsView
-            //self.curtainView.frame.origin.x = self.view.safeAreaInsets.left
             self.curtainView.frame.origin.y = self.view.safeAreaInsets.top
             self.curtainView.frame.size.width = self.view.safeAreaLayoutGuide.layoutFrame.width
             self.curtainView.frame.size.height = self.view.safeAreaLayoutGuide.layoutFrame.height
             self.curtainView.slideIn()
         }
-//        purchasedMaterialsTableView.detailsButtonHandler = { material in
-//
-//        }
-//        purchasedMaterialsTableView.startButtonHandler = { material in
-//            guard let lessonCompletions = self.user?.lessonCompletions.filter({ $0.materialId == material.id })
-//            else {
-//                return
-//            }
-//            let lessons = material.lessons.sorted { $0.index < $1.index }
-//            if let nextLesson = lessons.first(where: { lesson in
-//                return !lessonCompletions.contains { $0.lessonId == lesson.id }
-//            }) {
-//                let lessonViewController = LessonViewController()
-//                lessonViewController.lesson = nextLesson
-//                self.present(lessonViewController, animated: true)
-//            } else {
-//
-//            }
-//        }
-//        let profileContainerView = UIView()
-//        view.addSubview(scrollView)
-//        scrollView.addSubview(profileView)
-//        profileView.addSubview(profileContainerView)
-//        profileContainerView.addSubview(profileImageView)
-//        profileContainerView.addSubview(nameLabel)
-//        profileContainerView.addSubview(bioTextView)
-//        profileContainerView.addSubview(followingsButton)
-//        profileContainerView.addSubview(followersButton)
-//        scrollView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-//            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-//            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-//            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-//            ])
-//        profileContainerView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            profileContainerView.centerXAnchor.constraint(equalTo: profileView.safeAreaLayoutGuide.centerXAnchor),
-//            profileContainerView.centerYAnchor.constraint(equalTo: profileView.safeAreaLayoutGuide.centerYAnchor),
-//            profileContainerView.widthAnchor.constraint(equalTo: profileView.safeAreaLayoutGuide.widthAnchor, multiplier: 0.9),
-//            profileContainerView.heightAnchor.constraint(equalTo: profileView.safeAreaLayoutGuide.heightAnchor, multiplier: 0.9),
-//            ])
-//        profileImageView.backgroundColor = .orange
-//        profileImageView.contentMode = .scaleAspectFit
-//        profileImageView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            profileImageView.leadingAnchor.constraint(equalTo: profileContainerView.leadingAnchor),
-//            profileImageView.topAnchor.constraint(equalTo: profileContainerView.topAnchor),
-//            profileImageView.widthAnchor.constraint(equalTo: profileContainerView.widthAnchor, multiplier: 0.4),
-//            profileImageView.heightAnchor.constraint(equalTo: profileImageView.widthAnchor),
-//            ])
+        let profileImageButtonSize = max(44, UIFont.tiny.pointSize * 2)
+        profileImageButton.contentMode = .scaleAspectFill
+        profileImageButton.clipsToBounds = true
+        profileImageButton.layer.cornerRadius = profileImageButtonSize / 2
+        profileImageButton.addTarget(self, action: #selector(onTouchUpInsideProfileImageButton(_:)), for: .touchUpInside)
+        profileImageButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            profileImageButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: UIFont.tiny.pointSize),
+            profileImageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -UIFont.tiny.pointSize),
+            profileImageButton.widthAnchor.constraint(equalToConstant: profileImageButtonSize),
+            profileImageButton.heightAnchor.constraint(equalTo: profileImageButton.widthAnchor),
+            ])
+        profileView.onTapProfileImageView = {
+            let imagePickerController = UIImagePickerController()
+            imagePickerController.delegate = self
+            let alertController = UIAlertController(title: nil, message: "ソースを選択してください", preferredStyle: .actionSheet)
+            let presentImagePirckerController: (UIImagePickerController.SourceType) -> Void = { sourceType in
+                guard UIImagePickerController.isSourceTypeAvailable(sourceType) else {
+                    return
+                }
+                imagePickerController.sourceType = sourceType
+                self.present(imagePickerController, animated: true)
+            }
+            alertController.addAction(UIAlertAction(title: "カメラ", style: .default) { _ in
+                presentImagePirckerController(.camera)
+            })
+            alertController.addAction(UIAlertAction(title: "ライブラリ", style: .default) { _ in
+                presentImagePirckerController(.photoLibrary)
+            })
+            alertController.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
+            self.present(alertController, animated: true)
+        }
+        profileView.translatesAutoresizingMaskIntoConstraints = false
+        profileViewTrailingConstraint = profileView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor)
+        NSLayoutConstraint.activate([
+            profileViewTrailingConstraint!,
+            profileView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            profileView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            profileView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.7),
+            ])
     }
     
-//    private func layoutViews() {
-//        profileView.backgroundColor = .red
-//        profileView.frame = CGRect(
-//            origin: .zero,
-//            size: CGSize(width: view.bounds.width, height: view.bounds.height * 0.4)
-//        )
-//    }
+    private func hideProfileView(
+        animationDuration: TimeInterval = UIView.Animation.Duration.fast,
+        completion: ((Bool) -> Void)? = nil
+    ) {
+        profileViewTrailingConstraint?.constant = 0
+        tabBarView.removeBlackout(duration: animationDuration)
+        UIView.animate(withDuration: animationDuration, animations: {
+            self.view.layoutIfNeeded()
+        }) { finished in
+            completion?(finished)
+        }
+    }
+    
+    @objc
+    private func onTouchUpInsideProfileImageButton(_ sender: UIButton) {
+        guard let constant = profileViewTrailingConstraint?.constant,
+              constant == 0
+        else {
+            return
+        }
+        let animationDuration = UIView.Animation.Duration.fast
+        profileViewTrailingConstraint?.constant = profileView.bounds.width
+        let blackoutView = tabBarView.addBlackout(duration: animationDuration)
+        blackoutView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapBlackoutView(_:))))
+        UIView.animate(withDuration: animationDuration) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    @objc
+    private func onTapBlackoutView(_ sender: UITapGestureRecognizer) {
+        let animationDuration = UIView.Animation.Duration.fast
+        profileViewTrailingConstraint?.constant = 0
+        tabBarView.removeBlackout(duration: animationDuration)
+        UIView.animate(withDuration: animationDuration) {
+            self.view.layoutIfNeeded()
+        }
+    }
     
 }
+
+
+extension HomeViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        defer {
+            picker.dismiss(animated: true)
+        }
+        guard let image = info[.originalImage] as? UIImage,
+              let imageData = image.pngData()
+//            ,
+//              let asset = info[UIImagePickerController.InfoKey.phAsset] as? PHAsset,
+//              let fileName = PHAssetResource.assetResources(for: asset).first?.originalFilename
+        else {
+            return
+        }
+        //print(imageData)
+        //profileImageButton.setima
+        HTTP().upload("TTTTT.png", fileData: imageData, fileUsage: .userProfileImage)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+    }
+    
+}
+
 
 fileprivate class ProgressBarView: UIView {
     
@@ -547,6 +609,7 @@ fileprivate class MaterialDetailsView: UIView {
             scrollView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             scrollView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
             ])
+//        headerView.frame.size = bounds.size
         headerContainerView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             headerContainerView.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
@@ -555,18 +618,20 @@ fileprivate class MaterialDetailsView: UIView {
             headerContainerView.heightAnchor.constraint(equalTo: headerView.heightAnchor, multiplier: 0.8),
             ])
         thumbnailImageView.contentMode = .scaleAspectFit
+        thumbnailImageView.image = UIImage(named: "no-image")
         thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             thumbnailImageView.leadingAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.leadingAnchor),
-            thumbnailImageView.centerYAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.centerYAnchor),
+            thumbnailImageView.topAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.topAnchor),
             thumbnailImageView.widthAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.widthAnchor, multiplier: 0.4),
             thumbnailImageView.heightAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.heightAnchor),
             ])
-        titleLabel.font = .boldMedium
-        titleLabel.numberOfLines = 2
+        titleLabel.font = .boldSmall
+        titleLabel.numberOfLines = 0
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: thumbnailImageView.trailingAnchor, constant: UIFont.tiny.pointSize),
+//            titleLabel.trailingAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.trailingAnchor),
             titleLabel.topAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.topAnchor),
             ])
         separatorView1.backgroundColor = .lightGray
@@ -631,7 +696,7 @@ extension MaterialDetailsView: AccordionViewDataSource, AccordionViewDelegate {
         let containerView = UIView()
         let lessonButton = LessonButton(type: .system)
         containerView.addSubview(lessonButton)
-        lessonButton.titleLabel?.font = .boldMedium
+        lessonButton.titleLabel?.font = .boldTiny
         lessonButton.setTitle(material?.lessons[item].title, for: .normal)
         lessonButton.lesson = material?.lessons[item]
         lessonButton.addTarget(self, action: #selector(onTouchUpInsideLessonButton(_:)), for: .touchUpInside)
@@ -641,7 +706,7 @@ extension MaterialDetailsView: AccordionViewDataSource, AccordionViewDelegate {
             lessonButton.leadingAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.leadingAnchor),
             lessonButton.centerYAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.centerYAnchor),
             lessonButton.widthAnchor.constraint(equalToConstant: max(44,fitSize.width * 1.5)),
-            lessonButton.heightAnchor.constraint(equalToConstant: max(44, fitSize.height * 1.5) ),
+            lessonButton.heightAnchor.constraint(equalToConstant: max(44, fitSize.height * 1.5)),
             ])
         return containerView
     }
@@ -687,6 +752,57 @@ extension MaterialDetailsView: AccordionViewDataSource, AccordionViewDelegate {
     func accordionView(_ accordionView: AccordionView, DidChangeHeight height: CGFloat) {
         lessonsAccordionView.frame.size.height = height
         scrollView.contentSize.height = lessonsAccordionView.frame.maxY
+    }
+    
+}
+
+
+fileprivate class UserProfileView: UIView {
+    
+    var onTapProfileImageView: (() -> Void)?
+    
+    let profileImageView = UIImageView()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setupViews()
+    }
+    
+    private func setupViews() {
+        backgroundColor = .white
+        let headerView = UIView()
+        addSubview(headerView)
+        headerView.addSubview(profileImageView)
+        headerView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            headerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            headerView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            headerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            headerView.heightAnchor.constraint(equalTo: safeAreaLayoutGuide.heightAnchor, multiplier: 0.3),
+            ])
+        let profileImageViewSize = max(44, UIFont.tiny.pointSize * 3)
+        profileImageView.contentMode = .scaleAspectFill
+        profileImageView.clipsToBounds = true
+        profileImageView.layer.cornerRadius = profileImageViewSize / 2
+        profileImageView.isUserInteractionEnabled = true
+        profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapProfileImageView(_:))))
+        profileImageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            profileImageView.leadingAnchor.constraint(equalTo: headerView.safeAreaLayoutGuide.leadingAnchor, constant: UIFont.tiny.pointSize),
+            profileImageView.topAnchor.constraint(equalTo: headerView.safeAreaLayoutGuide.topAnchor, constant: UIFont.tiny.pointSize),
+            profileImageView.widthAnchor.constraint(equalToConstant: profileImageViewSize),
+            profileImageView.heightAnchor.constraint(equalToConstant: profileImageViewSize),
+            ])
+    }
+    
+    @objc
+    private func onTapProfileImageView(_ sender: UITapGestureRecognizer) {
+        onTapProfileImageView?()
     }
     
 }

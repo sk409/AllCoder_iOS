@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        let material = (try! jsonDecoder.decode([Material].self, from: data!)).first!
 //        lessonViewController.lesson = material.lessons.first(where: { $0.id == 1 })
 //        window?.rootViewController = lessonViewController
+//        HTTP().upload("minus-button.png", fileData: UIImage(named: "minus-button")!.pngData()!, fileUsage: .userProfileImage)
         if Auth.shared.isLoggedIn() {
             let dashboardTabBarController = DashboardTabBarController()
             dashboardTabBarController.user = Auth.shared.user

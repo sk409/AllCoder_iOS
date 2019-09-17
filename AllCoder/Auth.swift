@@ -63,15 +63,8 @@ class Auth {
     }
     
     func isLoggedIn() -> Bool {
+        // TODO: ユーザが削除されていないことを確認
         return UserDefaults.standard.value(forKey: Auth.userIdKey) != nil
-    }
-    
-    private init() {
-        let semaphore = DispatchSemaphore(value: 0)
-        fetchUser() { _ in
-            semaphore.signal()
-        }
-        semaphore.wait()
     }
     
     func fetchUser(completion: ((User?) -> Void)? = nil) {
@@ -99,6 +92,14 @@ class Auth {
             }
             self.user = users.first
         }
+    }
+    
+    private init() {
+        let semaphore = DispatchSemaphore(value: 0)
+        fetchUser() { _ in
+            semaphore.signal()
+        }
+        semaphore.wait()
     }
     
 }
