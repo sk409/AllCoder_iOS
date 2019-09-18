@@ -23,7 +23,7 @@ class MaterialSearchViewController: UIViewController {
         let headerView = UIView()
         view.addSubview(headerView)
         view.addSubview(materialsScrollView)
-        view.addSubview(curtainView)
+        curtainView.hiddenView = view
         headerView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -63,11 +63,6 @@ class MaterialSearchViewController: UIViewController {
         materialPurchaseConfirmationAlertView.cancelButton.addTarget(self, action: #selector(onTouchUpInsidePurchaseCancelButton(_:)), for: .touchUpInside)
         materialPurchaseConfirmationAlertView.downloadButton.addTarget(self, action: #selector(onTouchUpInsideDownloadMaterialButton(_:)), for: .touchUpInside)
     }
-    
-//    private func setupGestureRecognizers() {
-//        panGestureRecognizer.addTarget(self, action: #selector(handlePanGesture(_:)))
-//        panGestureRecognizer.delegate = self
-//    }
     
     private func fetchMaterials() {
         let http = HTTP()

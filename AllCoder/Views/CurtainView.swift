@@ -2,6 +2,23 @@ import UIKit
 
 class CurtainView: UIView {
     
+    var hiddenView: UIView? {
+        didSet {
+            removeFromSuperview()
+            guard let hiddenView = hiddenView else {
+                return
+            }
+            hiddenView.addSubview(self)
+            translatesAutoresizingMaskIntoConstraints = false
+            leadingConstraint = leadingAnchor.constraint(equalTo: hiddenView.trailingAnchor)
+            NSLayoutConstraint.activate([
+                leadingConstraint!,
+                topAnchor.constraint(equalTo: hiddenView.topAnchor),
+                widthAnchor.constraint(equalTo: hiddenView.widthAnchor),
+                heightAnchor.constraint(equalTo: hiddenView.heightAnchor),
+                ])
+        }
+    }
     let panGestureRecognizer = UIPanGestureRecognizer()
     
     var contentView: UIView? {
@@ -23,15 +40,15 @@ class CurtainView: UIView {
         }
     }
     
+    private var leadingConstraint: NSLayoutConstraint?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupViews()
         setupGestureRecognizers()
     }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        setupViews()
         setupGestureRecognizers()
     }
     
@@ -39,8 +56,13 @@ class CurtainView: UIView {
         withDuration animationDuration: TimeInterval = UIView.Animation.Duration.fast,
         completion: ((Bool) -> Void)? = nil
     ) {
+//        guard let hiddenView = hiddenView else {
+//            completion?(false)
+//            return
+//        }
+        leadingConstraint?.constant = -bounds.width
         UIView.animate(withDuration: animationDuration, animations: {
-            self.frame.origin.x = 0
+            self.superview?.layoutIfNeeded()
         }) { finished in
             completion?(finished)
         }
@@ -50,18 +72,12 @@ class CurtainView: UIView {
         withDuration animationDuration: TimeInterval = UIView.Animation.Duration.fast,
         completion: ((Bool) -> Void)? = nil
     ) {
+        leadingConstraint?.constant = 0
         UIView.animate(withDuration: animationDuration, animations: {
-            self.frame.origin.x = UIScreen.main.bounds.width
+            self.superview?.layoutIfNeeded()
         }) { finished in
             completion?(finished)
         }
-    }
-    
-    private func setupViews() {
-        frame.origin.x = UIScreen.main.bounds.width
-        frame.origin.y = 0
-        frame.size.width = UIScreen.main.bounds.width
-        frame.size.height = UIScreen.main.bounds.height
     }
     
     private func setupGestureRecognizers() {
@@ -71,16 +87,21 @@ class CurtainView: UIView {
     
     @objc
     private func handlePanGesture(_ sender: UIPanGestureRecognizer) {
+        guard let hiddenView = hiddenView else {
+            return
+        }
         if sender.state == .changed {
             let velocity = sender.velocity(in: self)
             if 3000 <= velocity.x {
                 slideOut()
             } else {
-                frame.origin.x += velocity.x * 0.015
-                frame.origin.x = min(UIScreen.main.bounds.width, max(0, frame.origin.x))
+                if let leadingConstraint = leadingConstraint {
+                    leadingConstraint.constant += velocity.x * 0.015
+                    leadingConstraint.constant = min(0, max(-hiddenView.bounds.width, leadingConstraint.constant))
+                }
             }
         } else if sender.state == .ended {
-            if (UIScreen.main.bounds.width * 0.5) < frame.origin.x {
+            if (hiddenView.bounds.width * 0.5) < frame.origin.x {
                 slideOut()
             } else {
                slideIn()

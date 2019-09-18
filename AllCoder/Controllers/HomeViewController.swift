@@ -52,7 +52,7 @@ class HomeViewController: UIViewController {
     private func setupViews() {
         view.addSubview(maskView)
         maskView.addSubview(tabBarView)
-        maskView.addSubview(curtainView)
+        curtainView.hiddenView = maskView
         maskView.addSubview(profileImageButton)
         view.addSubview(profileView)
         maskView.translatesAutoresizingMaskIntoConstraints = false
@@ -99,10 +99,9 @@ class HomeViewController: UIViewController {
                 self.present(lessonViewController, animated: true)
             }
             self.curtainView.contentView = materialDetailsView
-//            self.curtainView.frame.origin.x = self.maskView.bounds.width
-//            self.curtainView.frame.origin.y = 0
-            self.curtainView.frame.size.width = self.maskView.safeAreaLayoutGuide.layoutFrame.width
-            self.curtainView.frame.size.height = self.maskView.safeAreaLayoutGuide.layoutFrame.height
+            //print(self.curtainView.bounds.size)
+            //self.curtainView.frame.size = self.maskView.frame.size
+            //print(self.curtainView.bounds.size)
             self.curtainView.slideIn()
         }
         profileView.onTapProfileImageView = {
@@ -645,7 +644,7 @@ fileprivate class MaterialDetailsView: UIView {
         lessonsAccordionView.frame.size.width = scrollView.bounds.width
         lessonsAccordionView.frame.size.height = lessonsAccordionView.height
         scrollView.contentSize.width = scrollView.bounds.width
-        scrollView.contentSize.height = lessonsAccordionView.frame.maxY
+        //scrollView.contentSize.height = lessonsAccordionView.frame.maxY
     }
     
     @objc
@@ -778,7 +777,7 @@ extension MaterialDetailsView: AccordionViewDataSource, AccordionViewDelegate {
                 }
             }
         } else {
-            scrollView.contentSize.height = lessonsAccordionView.frame.maxY
+            scrollView.contentSize.height = frame.origin.y + lessonsAccordionView.frame.maxY
         }
     }
     
