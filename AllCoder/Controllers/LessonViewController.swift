@@ -2,6 +2,7 @@ import UIKit
 
 class LessonViewController: UIViewController {
     
+    
     override var prefersStatusBarHidden: Bool {
         return true
     }
@@ -881,9 +882,13 @@ fileprivate class CodeEditorView: UIScrollView {
             return
         }
         let textSize = self.textSize(upTo: nextQuestionAnswer.range.location, omittingLastLine: true)
-        var lineSize = self.lineSize(characterIndex: nextQuestionAnswer.range.location + nextQuestionAnswer.enteredText.count - 1)
-        if self.textSize(upTo: nextQuestionAnswer.range.location + nextQuestionAnswer.enteredText.count).height !=
-           self.textSize(upTo: nextQuestionAnswer.range.location + nextQuestionAnswer.enteredText.count - 1).height
+        var lineSize =
+            nextQuestionAnswer.range.location == 0 ?
+                CGSize.zero :
+                self.lineSize(characterIndex: nextQuestionAnswer.range.location + nextQuestionAnswer.enteredText.count - 1)
+        if (nextQuestionAnswer.range.location == 0) ||
+           (self.textSize(upTo: nextQuestionAnswer.range.location + nextQuestionAnswer.enteredText.count).height !=
+           self.textSize(upTo: nextQuestionAnswer.range.location + nextQuestionAnswer.enteredText.count - 1).height)
         {
             lineSize.width = 0
         }
