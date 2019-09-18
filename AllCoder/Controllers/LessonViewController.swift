@@ -365,9 +365,43 @@ class LessonViewController: UIViewController {
         guard let codeEditorView = codeEditorView else {
             return
         }
+        let notificationLabel = UILabel()
+        view.addSubview(notificationLabel)
+        notificationLabel.font = .boldLarge
+        notificationLabel.textColor = Appearance.CodeEditor.textColor
+        notificationLabel.textAlignment = .center
+        notificationLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            notificationLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            notificationLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            ])
+        let animateNotificationLabel = {
+            let magnification: CGFloat = 1.25
+            let notificationLabelFitSize = notificationLabel.fitSize
+            NSLayoutConstraint.activate([
+                notificationLabel.widthAnchor.constraint(equalToConstant: notificationLabelFitSize.width * magnification),
+                notificationLabel.heightAnchor.constraint(equalToConstant: notificationLabelFitSize.height * magnification),
+                ])
+            notificationLabel.alpha = 0
+            UIView.Animation.normal(animations: {
+                notificationLabel.alpha = 1
+            }) { _ in
+                UIView.Animation.normal(animations: {
+                    notificationLabel.alpha = 0
+                }) { _ in
+                    notificationLabel.removeFromSuperview()
+                }
+            }
+        }
         guard codeEditorView.isCorrect(text: text) else {
+            notificationLabel.text = "✖︎"
+            notificationLabel.backgroundColor = .signalRed
+            animateNotificationLabel()
             return
         }
+        notificationLabel.text = "◯"
+        notificationLabel.backgroundColor = .seaGreen
+        animateNotificationLabel()
         guard codeEditorView.solve(questionId: activeQuestion.id, text: text) else {
             return
         }
@@ -1064,6 +1098,7 @@ fileprivate class KeyboardView: UIScrollView {
         var rows: [[UIButton]] = [[]]
         var maxLineHeight: CGFloat = 0
         var pointer = CGPoint(x: insets.left, y: insets.top)
+        buttons.sort { $0.bounds.width < $1.bounds.width }
         for button in buttons {
             if contentSize.width <
                 (pointer.x + button.bounds.width + insets.right)

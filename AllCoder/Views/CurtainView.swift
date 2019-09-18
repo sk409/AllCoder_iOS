@@ -36,7 +36,7 @@ class CurtainView: UIView {
     }
     
     func slideIn(
-        withDuration animationDuration: TimeInterval = UIView.Animation.Duration.normal,
+        withDuration animationDuration: TimeInterval = UIView.Animation.Duration.fast,
         completion: ((Bool) -> Void)? = nil
     ) {
         UIView.animate(withDuration: animationDuration, animations: {
@@ -47,7 +47,7 @@ class CurtainView: UIView {
     }
     
     func slideOut(
-        withDuration animationDuration: TimeInterval = UIView.Animation.Duration.normal,
+        withDuration animationDuration: TimeInterval = UIView.Animation.Duration.fast,
         completion: ((Bool) -> Void)? = nil
     ) {
         UIView.animate(withDuration: animationDuration, animations: {

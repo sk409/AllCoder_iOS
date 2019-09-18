@@ -11,6 +11,7 @@ class HomeViewController: UIViewController {
     private let purchasedMaterialsTableView = PurchasedMaterialsTableView()
     private let curtainView = CurtainView()
     private let createdMaterialsTableView = UITableView()
+    private let maskView = UIView()
     private let profileImageButton = UIButton()
     private let profileView = UserProfileView()
     
@@ -40,90 +41,73 @@ class HomeViewController: UIViewController {
             self.user = (try? jsonDecoder.decode([User].self, from: response))?.first
             self.purchasedMaterialsTableView.materials = self.user?.purchasedMaterials
             self.purchasedMaterialsTableView.lessonCompletions = self.user?.lessonCompletions
-            var profileImage: UIImage?
-            if let profileImagePath = self.user?.profileImagePath,
-                let profileImageData = try? Data(contentsOf: HTTP.defaultOrigin.appendingPathComponent(profileImagePath))
-            {
-                profileImage = UIImage(data: profileImageData)
-            } else {
-                profileImage = UIImage(named: "no-image")
-            }
             DispatchQueue.main.async {
                 self.purchasedMaterialsTableView.reloadData()
-                self.profileImageButton.setImage(profileImage, for: .normal)
-                self.profileView.profileImageView.image = profileImage
+                self.profileView.profileImageView.fetch(path: self.user?.profileImagePath)
+                self.profileImageButton.setImage(self.profileView.profileImageView.image, for: .normal)
             }
         }
     }
     
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//        fetchMaterials()
-//    }
-    
-//    private func fetchMaterials() {
-//        guard let user = user else {
-//            return
-//        }
-//        let parameters = [
-//            URLQueryItem(name: "user_id", value: String(user.id)),
-//            URLQueryItem(name: "purchased", value: nil),
-//        ]
-//        HTTP().async(route: .init(resource: .materials, name: .index), parameters: parameters) { response in
-//            guard let response = response else {
-//                return
-//            }
-//            let jsonDecoder = JSONDecoder()
-//            jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-//            DispatchQueue.main.async {
-//                self.purchasedMaterialsTableView.materials = try! jsonDecoder.decode([Material].self, from: response)
-//            }
-//        }
-//    }
-    
     private func setupViews() {
-        view.addSubview(tabBarView)
-        view.addSubview(curtainView)
-        view.addSubview(profileImageButton)
+        view.addSubview(maskView)
+        maskView.addSubview(tabBarView)
+        maskView.addSubview(curtainView)
+        maskView.addSubview(profileImageButton)
         view.addSubview(profileView)
+        maskView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            maskView.leadingAnchor.constraint(equalTo: profileView.trailingAnchor),
+            maskView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            maskView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor),
+            maskView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
+            ])
         tabBarView.set(contentViews: ["購入した教材": purchasedMaterialsTableView, "作成した教材": createdMaterialsTableView])
         tabBarView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tabBarView.leadingAnchor.constraint(equalTo: profileView.trailingAnchor),
-            tabBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tabBarView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            tabBarView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor),
+            tabBarView.leadingAnchor.constraint(equalTo: maskView.safeAreaLayoutGuide.leadingAnchor),
+            tabBarView.trailingAnchor.constraint(equalTo: maskView.safeAreaLayoutGuide.trailingAnchor),
+            tabBarView.topAnchor.constraint(equalTo: maskView.safeAreaLayoutGuide.topAnchor),
+            tabBarView.bottomAnchor.constraint(equalTo: maskView.safeAreaLayoutGuide.bottomAnchor),
             ])
-        purchasedMaterialsTableView.onSelectCell = { material in
-            let materialDetailsView = MaterialDetailsView()
-            materialDetailsView.material = material
-            materialDetailsView.transitionToLessonViewController = { lesson in
-                let lessonViewController = LessonViewController()
-                lessonViewController.lesson = lesson
-                self.present(lessonViewController, animated: true)
-            }
-            self.curtainView.contentView = materialDetailsView
-            self.curtainView.frame.origin.y = self.view.safeAreaInsets.top
-            self.curtainView.frame.size.width = self.view.safeAreaLayoutGuide.layoutFrame.width
-            self.curtainView.frame.size.height = self.view.safeAreaLayoutGuide.layoutFrame.height
-            self.curtainView.slideIn()
-        }
         let profileImageButtonSize = max(44, UIFont.tiny.pointSize * 2)
+        let profileImageButtonBottomConstant = UIFont.tiny.pointSize
         profileImageButton.contentMode = .scaleAspectFill
         profileImageButton.clipsToBounds = true
         profileImageButton.layer.cornerRadius = profileImageButtonSize / 2
         profileImageButton.addTarget(self, action: #selector(onTouchUpInsideProfileImageButton(_:)), for: .touchUpInside)
         profileImageButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            profileImageButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: UIFont.tiny.pointSize),
-            profileImageButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -UIFont.tiny.pointSize),
+            profileImageButton.leadingAnchor.constraint(equalTo: maskView.safeAreaLayoutGuide.leadingAnchor, constant: UIFont.tiny.pointSize),
+            profileImageButton.bottomAnchor.constraint(equalTo: maskView.safeAreaLayoutGuide.bottomAnchor, constant: -profileImageButtonBottomConstant),
             profileImageButton.widthAnchor.constraint(equalToConstant: profileImageButtonSize),
             profileImageButton.heightAnchor.constraint(equalTo: profileImageButton.widthAnchor),
             ])
+        purchasedMaterialsTableView.onSelectCell = { material in
+            let materialDetailsView = MaterialDetailsView()
+            materialDetailsView.material = material
+            materialDetailsView.lessonCompletions = self.user?.lessonCompletions
+            materialDetailsView.scrollView.contentInset = UIEdgeInsets(
+                top: 0,
+                left: 0,
+                bottom: self.profileImageButton.bounds.size.height + profileImageButtonBottomConstant,
+                right: 0
+            )
+            materialDetailsView.transitionToLessonViewController = { lesson in
+                let lessonViewController = LessonViewController()
+                lessonViewController.lesson = lesson
+                self.present(lessonViewController, animated: true)
+            }
+            self.curtainView.contentView = materialDetailsView
+//            self.curtainView.frame.origin.x = self.maskView.bounds.width
+//            self.curtainView.frame.origin.y = 0
+            self.curtainView.frame.size.width = self.maskView.safeAreaLayoutGuide.layoutFrame.width
+            self.curtainView.frame.size.height = self.maskView.safeAreaLayoutGuide.layoutFrame.height
+            self.curtainView.slideIn()
+        }
         profileView.onTapProfileImageView = {
             let imagePickerController = UIImagePickerController()
             imagePickerController.delegate = self
-            let alertController = UIAlertController(title: nil, message: "ソースを選択してください", preferredStyle: .actionSheet)
             let presentImagePirckerController: (UIImagePickerController.SourceType) -> Void = { sourceType in
                 guard UIImagePickerController.isSourceTypeAvailable(sourceType) else {
                     return
@@ -131,6 +115,7 @@ class HomeViewController: UIViewController {
                 imagePickerController.sourceType = sourceType
                 self.present(imagePickerController, animated: true)
             }
+            let alertController = UIAlertController(title: nil, message: "ソースを選択してください", preferredStyle: .actionSheet)
             alertController.addAction(UIAlertAction(title: "カメラ", style: .default) { _ in
                 presentImagePirckerController(.camera)
             })
@@ -150,19 +135,6 @@ class HomeViewController: UIViewController {
             ])
     }
     
-    private func hideProfileView(
-        animationDuration: TimeInterval = UIView.Animation.Duration.fast,
-        completion: ((Bool) -> Void)? = nil
-    ) {
-        profileViewTrailingConstraint?.constant = 0
-        tabBarView.removeBlackout(duration: animationDuration)
-        UIView.animate(withDuration: animationDuration, animations: {
-            self.view.layoutIfNeeded()
-        }) { finished in
-            completion?(finished)
-        }
-    }
-    
     @objc
     private func onTouchUpInsideProfileImageButton(_ sender: UIButton) {
         guard let constant = profileViewTrailingConstraint?.constant,
@@ -172,7 +144,7 @@ class HomeViewController: UIViewController {
         }
         let animationDuration = UIView.Animation.Duration.fast
         profileViewTrailingConstraint?.constant = profileView.bounds.width
-        let blackoutView = tabBarView.addBlackout(duration: animationDuration)
+        let blackoutView = maskView.addBlackout(duration: animationDuration)
         blackoutView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapBlackoutView(_:))))
         UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()
@@ -183,7 +155,7 @@ class HomeViewController: UIViewController {
     private func onTapBlackoutView(_ sender: UITapGestureRecognizer) {
         let animationDuration = UIView.Animation.Duration.fast
         profileViewTrailingConstraint?.constant = 0
-        tabBarView.removeBlackout(duration: animationDuration)
+        maskView.removeBlackout(duration: animationDuration)
         UIView.animate(withDuration: animationDuration) {
             self.view.layoutIfNeeded()
         }
@@ -554,15 +526,16 @@ fileprivate class MaterialDetailsView: UIView {
     
     var material: Material? {
         didSet {
+            thumbnailImageView.fetch(path: material?.thumbnailImagePath)
             titleLabel.text = material?.title
             descriptionTextView.text = material?.description
-            lessonsAccordionView.reloadData()
         }
     }
     var lessonCompletions: [LessonCompletion]?
     var transitionToLessonViewController: ((Lesson) -> Void)?
     
-    private let scrollView = UIScrollView()
+    let scrollView = UIScrollView()
+    
     private let headerView = UIView()
     private let separatorView1 = UIView()
     private let bodyView = UIView()
@@ -609,16 +582,16 @@ fileprivate class MaterialDetailsView: UIView {
             scrollView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             scrollView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
             ])
+//        scrollView.frame.size = bounds.size
 //        headerView.frame.size = bounds.size
         headerContainerView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             headerContainerView.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
             headerContainerView.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
-            headerContainerView.widthAnchor.constraint(equalTo: headerView.widthAnchor, multiplier: 0.8),
-            headerContainerView.heightAnchor.constraint(equalTo: headerView.heightAnchor, multiplier: 0.8),
+            headerContainerView.widthAnchor.constraint(equalTo: headerView.widthAnchor, multiplier: 0.9),
+            headerContainerView.heightAnchor.constraint(equalTo: headerView.heightAnchor, multiplier: 0.9),
             ])
         thumbnailImageView.contentMode = .scaleAspectFit
-        thumbnailImageView.image = UIImage(named: "no-image")
         thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             thumbnailImageView.leadingAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.leadingAnchor),
@@ -631,7 +604,7 @@ fileprivate class MaterialDetailsView: UIView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: thumbnailImageView.trailingAnchor, constant: UIFont.tiny.pointSize),
-//            titleLabel.trailingAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.trailingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.trailingAnchor),
             titleLabel.topAnchor.constraint(equalTo: headerContainerView.safeAreaLayoutGuide.topAnchor),
             ])
         separatorView1.backgroundColor = .lightGray
@@ -693,50 +666,73 @@ extension MaterialDetailsView: AccordionViewDataSource, AccordionViewDelegate {
     }
     
     func accordionView(_ accordionView: AccordionView, headerViewForItemAt item: Int) -> UIView {
+        guard let lesson = material?.lessons[item] else {
+            return UIView()
+        }
+        let completed = lessonCompletions?.first { $0.lessonId == lesson.id } != nil
         let containerView = UIView()
         let lessonButton = LessonButton(type: .system)
         containerView.addSubview(lessonButton)
         lessonButton.titleLabel?.font = .boldTiny
-        lessonButton.setTitle(material?.lessons[item].title, for: .normal)
-        lessonButton.lesson = material?.lessons[item]
+        lessonButton.titleLabel?.textAlignment = .left
+        lessonButton.setTitle(String(item + 1) + ": " + lesson.title, for: .normal)
+        lessonButton.setTitleColor(completed ? .signalGreen : .signalBlue, for: .normal)
+        lessonButton.lesson = lesson
         lessonButton.addTarget(self, action: #selector(onTouchUpInsideLessonButton(_:)), for: .touchUpInside)
         lessonButton.translatesAutoresizingMaskIntoConstraints = false
         let fitSize = lessonButton.fitSize
         NSLayoutConstraint.activate([
             lessonButton.leadingAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.leadingAnchor),
             lessonButton.centerYAnchor.constraint(equalTo: containerView.safeAreaLayoutGuide.centerYAnchor),
-            lessonButton.widthAnchor.constraint(equalToConstant: max(44,fitSize.width * 1.5)),
-            lessonButton.heightAnchor.constraint(equalToConstant: max(44, fitSize.height * 1.5)),
+            lessonButton.widthAnchor.constraint(equalToConstant: max(44,fitSize.width)),
+            lessonButton.heightAnchor.constraint(equalToConstant: max(44, fitSize.height)),
             ])
         return containerView
     }
     
     func accordionView(_ accordionView: AccordionView, bodyViewForItemAt item: Int) -> UIView {
         let descriptionTextView = UITextView()
+        let separatorView = UIView()
+        descriptionTextView.addSubview(separatorView)
         descriptionTextView.font = .small
         descriptionTextView.text = material?.lessons[item].description
+        separatorView.backgroundColor = .lightGray
+        separatorView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            separatorView.centerXAnchor.constraint(equalTo: descriptionTextView.safeAreaLayoutGuide.centerXAnchor),
+            separatorView.bottomAnchor.constraint(equalTo: descriptionTextView.safeAreaLayoutGuide.bottomAnchor),
+            separatorView.widthAnchor.constraint(equalTo: descriptionTextView.safeAreaLayoutGuide.widthAnchor, multiplier: 0.8),
+            separatorView.heightAnchor.constraint(equalToConstant: UIFont.tiny.pointSize * 0.1),
+            ])
         return descriptionTextView
     }
     
-    func accordionView(_ accordionView: AccordionView, headerViewHeightForItemAt item: Int, headerView: UIView) -> CGFloat {
+    func accordionView(_ accordionView: AccordionView, headerViewHeightForItemAt item: Int, headerView: UIView) -> CGFloat
+    {
         return UIFont.tiny.pointSize * 4
     }
     
-    func accordionView(_ accordionView: AccordionView, bodyViewHeightForItemAt item: Int, bodyView: UIView) -> CGFloat {
+    func accordionView(_ accordionView: AccordionView, bodyViewHeightForItemAt item: Int, bodyView: UIView) -> CGFloat
+    {
         return bodyView.fitSize.height
     }
     
-    func accordionView(_ accordionView: AccordionView, toggleButtonForItemAt item: Int) -> UIButton {
-        let button = UIButton()
-        button.setImage(UIImage(named: "plus-button"), for: .normal)
+    func accordionView(_ accordionView: AccordionView, toggleButtonForItemAt item: Int) -> UIButton
+    {
+        let button = UIButton(type: .system)
+        button.titleLabel?.font = .boldLarge
+        button.setTitle("+", for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal)
         return button
     }
     
-    func accordionView(_ accordionView: AccordionView, didToggle headerView: UIView, bodyView: UIView, toggleButton: UIButton, open: Bool) {
-        toggleButton.setImage(UIImage(named: open ? "minus-button" : "plus-button"), for: .normal)
+    func accordionView(_ accordionView: AccordionView, didToggle headerView: UIView, bodyView: UIView, toggleButton: UIButton, open: Bool)
+    {
+        toggleButton.setTitle(open ? "-" : "+", for: .normal)
     }
     
-    func accordionView(_ accordionView: AccordionView, toggleButtonPositionIn headerView: UIView, forItemAt item: Int, toggleButton: UIButton) -> CGPoint {
+    func accordionView(_ accordionView: AccordionView, toggleButtonPositionIn headerView: UIView, forItemAt item: Int, toggleButton: UIButton) -> CGPoint
+    {
         let headerViewHeight = self.accordionView(accordionView, headerViewHeightForItemAt: item, headerView: headerView)
         let buttonSize = self.accordionView(accordionView, toggleButtonSizeForItemAt: item, toggleButton: toggleButton)
         let originX = accordionView.bounds.width - buttonSize.width - UIFont.tiny.pointSize
@@ -744,14 +740,46 @@ extension MaterialDetailsView: AccordionViewDataSource, AccordionViewDelegate {
         return CGPoint(x: originX, y: originY)
     }
     
-    func accordionView(_ accordionView: AccordionView, toggleButtonSizeForItemAt item: Int, toggleButton: UIButton) -> CGSize {
+    func accordionView(_ accordionView: AccordionView, toggleButtonSizeForItemAt item: Int, toggleButton: UIButton) -> CGSize
+    {
         let buttonSize = max(44, UIFont.tiny.pointSize)
         return CGSize(width: buttonSize, height: buttonSize)
     }
     
-    func accordionView(_ accordionView: AccordionView, DidChangeHeight height: CGFloat) {
+    func accordionView(_ accordionView: AccordionView, DidChangeHeight height: CGFloat, trigerToggleButton: UIButton?, headerView: UIView?, bodyView: UIView?
+    ) {
         lessonsAccordionView.frame.size.height = height
-        scrollView.contentSize.height = lessonsAccordionView.frame.maxY
+        if let bodyView = bodyView {
+            var offsetY = bodyView.frame.origin.y
+            var superView = bodyView.superview
+            while superView != nil && superView != scrollView {
+                offsetY += (superView?.frame.origin.y ?? 0)
+                superView = superView?.superview
+            }
+            let shouldScrollUp = (lessonsAccordionView.frame.maxY < scrollView.contentOffset.y + scrollView.bounds.height)
+            let shouldScrollDown = (scrollView.contentOffset.y + scrollView.bounds.height < offsetY)
+            if !shouldScrollUp {
+                scrollView.contentSize.height = lessonsAccordionView.frame.maxY
+            }
+            UIView.Animation.fast(animations: {
+                if shouldScrollUp {
+                    self.scrollView.contentOffset.y =
+                        self.lessonsAccordionView.frame.maxY -
+                        self.scrollView.bounds.height
+                } else if shouldScrollDown {
+                    self.scrollView.contentOffset.y =
+                        offsetY -
+                        self.scrollView.bounds.height +
+                        UIFont.tiny.pointSize * 2
+                }
+            }) { _ in
+                if shouldScrollUp {
+                    self.scrollView.contentSize.height = self.lessonsAccordionView.frame.maxY
+                }
+            }
+        } else {
+            scrollView.contentSize.height = lessonsAccordionView.frame.maxY
+        }
     }
     
 }

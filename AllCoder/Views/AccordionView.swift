@@ -18,8 +18,8 @@ protocol AccordionViewDelegate {
     func accordionView(_ accordionView: AccordionView, isOpenItemAt item: Int) -> Bool
     func accordionView(_ accordionView: AccordionView, willToggle headerView: UIView, bodyView: UIView, toggleButton: UIButton, open: Bool)
     func accordionView(_ accordionView: AccordionView, didToggle headerView: UIView, bodyView: UIView, toggleButton: UIButton, open: Bool)
-    func accordionView(_ accordionView: AccordionView, WillChangeHeight height: CGFloat)
-    func accordionView(_ accordionView: AccordionView, DidChangeHeight height: CGFloat)
+    func accordionView(_ accordionView: AccordionView, WillChangeHeight height: CGFloat, trigerToggleButton: UIButton?, headerView: UIView?, bodyView: UIView?)
+    func accordionView(_ accordionView: AccordionView, DidChangeHeight height: CGFloat, trigerToggleButton: UIButton?, headerView: UIView?, bodyView: UIView?)
     func accordionViewtoggleAnimationDuration(_ accordionView: AccordionView) -> TimeInterval
     
 }
@@ -38,11 +38,13 @@ extension AccordionViewDelegate {
         return false
     }
     
-    func accordionView(_ accordionView: AccordionView, WillChangeHeight height: CGFloat) {
+    func accordionView(_ accordionView: AccordionView, WillChangeHeight height: CGFloat, trigerToggleButton: UIButton?, headerView: UIView?, bodyView: UIView?)
+    {
         
     }
     
-    func accordionView(_ accordionView: AccordionView, DidChangeHeight height: CGFloat) {
+    func accordionView(_ accordionView: AccordionView, DidChangeHeight height: CGFloat, trigerToggleButton: UIButton?, headerView: UIView?, bodyView: UIView?)
+    {
         
     }
     
@@ -76,7 +78,7 @@ class AccordionView: UIView {
         bodyViews.removeAll(keepingCapacity: true)
         bodyViewHeightConstraints.removeAll(keepingCapacity: true)
         let numberOfItems = dataSource.accordionViewNumberOfItems(self)
-        delegate.accordionView(self, WillChangeHeight: height)
+        delegate.accordionView(self, WillChangeHeight: height, trigerToggleButton: nil, headerView: nil, bodyView: nil)
         height = 0
         for itemIndex in 0..<numberOfItems {
             let headerView = delegate.accordionView(self, headerViewForItemAt: itemIndex)
@@ -121,7 +123,7 @@ class AccordionView: UIView {
                 bodyViewHeightConstraint,
                 ])
         }
-        delegate.accordionView(self, DidChangeHeight: height)
+        delegate.accordionView(self, DidChangeHeight: height, trigerToggleButton: nil, headerView: nil, bodyView: nil)
     }
     
     @objc
@@ -146,13 +148,13 @@ class AccordionView: UIView {
                      0
         bodyViewHeightConstraint.constant = toHeight
         delegate.accordionView(self, willToggle: headerView, bodyView: bodyView, toggleButton: sender, open: open)
-        delegate.accordionView(self, WillChangeHeight: height)
+        delegate.accordionView(self, WillChangeHeight: height, trigerToggleButton: sender, headerView: headerView, bodyView: bodyView)
         UIView.animate(withDuration: animationDuration, animations: {
             self.layoutIfNeeded()
         }) { _ in
             delegate.accordionView(self, didToggle: headerView, bodyView: bodyView, toggleButton: sender, open: open)
             self.height += (toHeight - fromHeight)
-            delegate.accordionView(self, DidChangeHeight: self.height)
+            delegate.accordionView(self, DidChangeHeight: self.height, trigerToggleButton: sender, headerView: headerView, bodyView: bodyView)
         }
     }
     
