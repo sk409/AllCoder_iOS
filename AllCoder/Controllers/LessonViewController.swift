@@ -75,12 +75,6 @@ class LessonViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        let button = UIButton()
-//        var p = NSMutableParagraphStyle()
-//        p.lineSpacing = 10
-//        button.setAttributedTitle(NSAttributedString(string: ""), for: .normal)
-//        button.titleLabel?.font = .boldSmall
-//        print(button.fitSize)
         setupViews()
         addObservers()
     }
@@ -611,6 +605,9 @@ fileprivate class CodeEditorView: UIScrollView {
         color: UIColor = Appearance.CodeEditor.textColor
         ) -> Frame?
     {
+        guard let file = file else {
+            return nil
+        }
         var borderViews = [UIView]()
         let makeBorderView = { () -> UIView in
             let borderView = UIView()
@@ -620,10 +617,12 @@ fileprivate class CodeEditorView: UIScrollView {
             return borderView
         }
         let borderSize = UIFont.tiny.pointSize * 0.1
-        let preLine = file?.text[..<startIndex].split(separator: "\n").last
-        let line = file?.text[startIndex..<endIndex]
-        let lineSize = (line != nil) ? textSize(String(line!)) : .zero
-        let x = (preLine != nil) ? textSize(String(preLine!)).width : CGFloat(0)
+        let head = file.text[...startIndex].split(separator: "\n").last
+        let line = file.text[startIndex..<endIndex]
+        let lineSize = textSize(String(line))
+        let x = (head != nil) ?
+            (textSize(String(head!)).width - textSize(String(file.text[startIndex])).width) :
+            CGFloat(0)
         let y = textSize(upTo: startIndex, omittingLastLine: true).height
         let leftBorderView = makeBorderView()
         leftBorderView.frame.origin.x = x
@@ -739,8 +738,10 @@ fileprivate class CodeEditorView: UIScrollView {
         guard let nextAnswer = answers.first else {
             return
         }
-        let line = file.text[..<nextAnswer.range.location].split(separator: "\n").last
-        let x = (line != nil) ? textSize(String(line!)).width : CGFloat(0)
+        let line = file.text[...nextAnswer.range.location].split(separator: "\n").last
+        let x = (line != nil) ?
+            textSize(String(line!)).width - textSize(String(file.text[nextAnswer.range.location])).width :
+            CGFloat(0)
         let y = textSize(upTo: nextAnswer.range.location, omittingLastLine: true).height
         caretView.frame.origin.x = insets.left + x
         caretView.frame.origin.y = insets.top + y
@@ -966,14 +967,6 @@ fileprivate class KeyboardView: UIScrollView {
         }
         contentSize.height = (pointer.y + maxLineHeight)
     }
-    
-//    override init(frame: CGRect) {
-//        super.init(frame: frame)
-//    }
-//
-//    required init?(coder aDecoder: NSCoder) {
-//        super.init(coder: aDecoder)
-//    }
     
 }
 
