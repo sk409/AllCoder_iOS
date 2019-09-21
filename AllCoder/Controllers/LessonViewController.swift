@@ -188,8 +188,7 @@ class LessonViewController: UIViewController {
     private func focusDescriptionTargets(
         animationDuration: TimeInterval = UIView.Animation.Duration.normal,
         completion: ((Bool) -> Void)? = nil
-        )
-    {
+    ) {
         guard let descriptionIndex = self.descriptionIndex else {
             completion?(false)
             return
@@ -200,9 +199,8 @@ class LessonViewController: UIViewController {
                     startIndex: target.startIndex,
                     endIndex: target.endIndex,
                     color: .signalRed)
-                    else
-                {
-                        continue
+                else {
+                    continue
                 }
                 self.focusFrames.append(frame)
             }
@@ -236,7 +234,7 @@ class LessonViewController: UIViewController {
     private func showDescriptionCollectionView(
         animationDuration: TimeInterval = UIView.Animation.Duration.normal,
         completion: ((Bool) -> Void)? = nil
-        ) {
+    ) {
         descriptionCollectionViewTopConstraint?.constant =
             -view.safeAreaInsets.bottom - descriptionCollectionView.bounds.height
         UIView.animate(withDuration: animationDuration, animations: {
@@ -293,8 +291,7 @@ class LessonViewController: UIViewController {
             }
             let activateNextQuestion = {
                 self.codeEditorView?.scroll(
-                    to: firstInputButton.startIndex,
-                    animationDuration: UIView.Animation.Duration.fast
+                    to: firstInputButton.startIndex
                 ) { _ in
                     var counter = [NSAttributedString: Int]()
                     for inputButton in question.inputButtons {
@@ -394,6 +391,9 @@ class LessonViewController: UIViewController {
         notificationLabel.backgroundColor = .seaGreen
         animateNotificationLabel()
         guard codeEditorView.solve(questionId: activeQuestion.id, text: text) else {
+            if let nextAnswer = codeEditorView.answers.first {
+                codeEditorView.scroll(to: nextAnswer.range.location)
+            }
             return
         }
         nextPhase()
@@ -487,21 +487,31 @@ fileprivate class CodeEditorView: UIScrollView {
         
     }
     
-    var font = UIFont.boldSmall
     var insets = UIEdgeInsets(
         top: UIFont.tiny.pointSize * 0.3,
         left: UIFont.tiny.pointSize * 0.5,
         bottom: UIFont.tiny.pointSize * 0.3,
         right: UIFont.tiny.pointSize * 0.5
     )
-    
+    var font = UIFont.boldSmall
+    var letterSpacing: CGFloat = 0 {
+        didSet {
+            fatalError("未対応")
+        }
+    }
     var lineSpacing: CGFloat = UIFont.tiny.pointSize {
         didSet {
             fatalError("未対応")
         }
     }
-    var frameBorderSize: CGFloat {
-        return font.pointSize * 0.1
+    var textAttributes: [NSAttributedString.Key: Any] {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = lineSpacing
+        return [
+            .font: font,
+            .kern: letterSpacing,
+            .paragraphStyle: paragraphStyle,
+        ]
     }
     
     private(set) var file: File?
@@ -529,10 +539,8 @@ fileprivate class CodeEditorView: UIScrollView {
         guard let syntaxHighlightedText = SyntaxHighlighter.highlight(file: file) else {
             return
         }
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineSpacing = lineSpacing
         syntaxHighlightedText.addAttributes(
-            [NSAttributedString.Key.font: font, .paragraphStyle: paragraphStyle],
+            textAttributes,
             range: NSRange(location: 0, length: syntaxHighlightedText.string.count)
         )
         answers.removeAll(keepingCapacity: true)
@@ -587,10 +595,9 @@ fileprivate class CodeEditorView: UIScrollView {
     
     func scroll(
         to textIndex: Int,
-        animationDuration: TimeInterval = UIView.Animation.Duration.normal,
+        animationDuration: TimeInterval = UIView.Animation.Duration.fast,
         completion: ((Bool) -> Void)? = nil
-        )
-    {
+    ) {
         let size = textSize(upTo: textIndex, omittingLastLine: true)
         UIView.animate(withDuration: animationDuration, animations: {
             self.contentOffset.y = size.height
@@ -603,8 +610,7 @@ fileprivate class CodeEditorView: UIScrollView {
         startIndex: Int,
         endIndex: Int,
         color: UIColor = Appearance.CodeEditor.textColor
-        ) -> Frame?
-    {
+    ) -> Frame? {
         guard let file = file else {
             return nil
         }
@@ -752,7 +758,8 @@ fileprivate class CodeEditorView: UIScrollView {
         guard let text = text else {
             return .zero
         }
-        let attributes = [NSAttributedString.Key.font: self.font]
+        var attributes = textAttributes
+        attributes.removeValue(forKey: .paragraphStyle)
         var size = text.size(withAttributes: attributes)
         let lines = text.split(separator: "\n", omittingEmptySubsequences: false).map { String($0) }
         size.height += self.lineSpacing * CGFloat(lines.count - 1)
