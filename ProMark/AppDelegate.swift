@@ -12,14 +12,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //Auth.shared.logout()
         window = UIWindow()
         window?.makeKeyAndVisible()
-//        let lessonViewController = LessonViewController()
-//        let data = HTTP().sync(route: .init(resource: .materials, name: .index), parameters: [URLQueryItem(name: "id", value: "1")])
-//        let jsonDecoder = JSONDecoder()
-//        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-//        let material = (try! jsonDecoder.decode([Material].self, from: data!)).first!
-//        lessonViewController.lesson = material.lessons.first(where: { $0.id == 1 })
-//        window?.rootViewController = lessonViewController
-//        HTTP().upload("minus-button.png", fileData: UIImage(named: "minus-button")!.pngData()!, fileUsage: .userProfileImage)
         if Auth.shared.isLoggedIn() {
             let dashboardTabBarController = DashboardTabBarController()
             dashboardTabBarController.user = Auth.shared.user
