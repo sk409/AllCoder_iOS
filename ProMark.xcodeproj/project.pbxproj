@@ -31,11 +31,8 @@
 		D73599DD23289B69004D985E /* NSNotification.Name+names.swift in Sources */ = {isa = PBXBuildFile; fileRef = D73599DC23289B69004D985E /* NSNotification.Name+names.swift */; };
 		D736D1C2232BA66A004DB6CB /* InputButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D736D1C1232BA66A004DB6CB /* InputButton.swift */; };
 		D749DF7723234F830010C673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D749DF7623234F830010C673 /* AppDelegate.swift */; };
-		D749DF7F23234F830010C673 /* AllCoder.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D749DF7D23234F830010C673 /* AllCoder.xcdatamodeld */; };
 		D749DF8123234F840010C673 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D749DF8023234F840010C673 /* Assets.xcassets */; };
 		D749DF8423234F840010C673 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D749DF8223234F840010C673 /* LaunchScreen.storyboard */; };
-		D749DF8F23234F840010C673 /* AllCoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D749DF8E23234F840010C673 /* AllCoderTests.swift */; };
-		D749DF9A23234F840010C673 /* AllCoderUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D749DF9923234F840010C673 /* AllCoderUITests.swift */; };
 		D749DFAC2323504C0010C673 /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = D749DFAB2323504C0010C673 /* HTTP.swift */; };
 		D749DFAE232358370010C673 /* Material.swift in Sources */ = {isa = PBXBuildFile; fileRef = D749DFAD232358370010C673 /* Material.swift */; };
 		D749DFB0232363660010C673 /* DashboardTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D749DFAF232363660010C673 /* DashboardTabBarController.swift */; };
@@ -107,18 +104,13 @@
 		D73599DA232880D8004D985E /* LessonViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonViewController.swift; sourceTree = "<group>"; };
 		D73599DC23289B69004D985E /* NSNotification.Name+names.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotification.Name+names.swift"; sourceTree = "<group>"; };
 		D736D1C1232BA66A004DB6CB /* InputButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputButton.swift; sourceTree = "<group>"; };
-		D749DF7323234F830010C673 /* AllCoder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AllCoder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D749DF7323234F830010C673 /* ProMark.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProMark.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D749DF7623234F830010C673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D749DF7E23234F830010C673 /* AllCoder.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = AllCoder.xcdatamodel; sourceTree = "<group>"; };
 		D749DF8023234F840010C673 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D749DF8323234F840010C673 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D749DF8523234F840010C673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D749DF8A23234F840010C673 /* AllCoderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AllCoderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D749DF8E23234F840010C673 /* AllCoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllCoderTests.swift; sourceTree = "<group>"; };
-		D749DF9023234F840010C673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D749DF9523234F840010C673 /* AllCoderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AllCoderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D749DF9923234F840010C673 /* AllCoderUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllCoderUITests.swift; sourceTree = "<group>"; };
-		D749DF9B23234F840010C673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D749DF8A23234F840010C673 /* ProMarkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProMarkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D749DF9523234F840010C673 /* ProMarkUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProMarkUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D749DFAB2323504C0010C673 /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTP.swift; sourceTree = "<group>"; };
 		D749DFAD232358370010C673 /* Material.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Material.swift; sourceTree = "<group>"; };
 		D749DFAF232363660010C673 /* DashboardTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardTabBarController.swift; sourceTree = "<group>"; };
@@ -231,9 +223,7 @@
 		D749DF6A23234F830010C673 = {
 			isa = PBXGroup;
 			children = (
-				D749DF7523234F830010C673 /* AllCoder */,
-				D749DF8D23234F840010C673 /* AllCoderTests */,
-				D749DF9823234F840010C673 /* AllCoderUITests */,
+				D749DF7523234F830010C673 /* ProMark */,
 				D749DF7423234F830010C673 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -241,14 +231,14 @@
 		D749DF7423234F830010C673 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D749DF7323234F830010C673 /* AllCoder.app */,
-				D749DF8A23234F840010C673 /* AllCoderTests.xctest */,
-				D749DF9523234F840010C673 /* AllCoderUITests.xctest */,
+				D749DF7323234F830010C673 /* ProMark.app */,
+				D749DF8A23234F840010C673 /* ProMarkTests.xctest */,
+				D749DF9523234F840010C673 /* ProMarkUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		D749DF7523234F830010C673 /* AllCoder */ = {
+		D749DF7523234F830010C673 /* ProMark */ = {
 			isa = PBXGroup;
 			children = (
 				D73059662329E25E00B8A420 /* Settings */,
@@ -266,28 +256,9 @@
 				D749DF8023234F840010C673 /* Assets.xcassets */,
 				D749DF8223234F840010C673 /* LaunchScreen.storyboard */,
 				D749DF8523234F840010C673 /* Info.plist */,
-				D749DF7D23234F830010C673 /* AllCoder.xcdatamodeld */,
 				D730436C232C9BE600F9165F /* FileExtension.swift */,
 			);
-			path = AllCoder;
-			sourceTree = "<group>";
-		};
-		D749DF8D23234F840010C673 /* AllCoderTests */ = {
-			isa = PBXGroup;
-			children = (
-				D749DF8E23234F840010C673 /* AllCoderTests.swift */,
-				D749DF9023234F840010C673 /* Info.plist */,
-			);
-			path = AllCoderTests;
-			sourceTree = "<group>";
-		};
-		D749DF9823234F840010C673 /* AllCoderUITests */ = {
-			isa = PBXGroup;
-			children = (
-				D749DF9923234F840010C673 /* AllCoderUITests.swift */,
-				D749DF9B23234F840010C673 /* Info.plist */,
-			);
-			path = AllCoderUITests;
+			path = ProMark;
 			sourceTree = "<group>";
 		};
 		D749DFA7232350310010C673 /* Controllers */ = {
@@ -366,9 +337,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D749DF7223234F830010C673 /* AllCoder */ = {
+		D749DF7223234F830010C673 /* ProMark */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D749DF9E23234F840010C673 /* Build configuration list for PBXNativeTarget "AllCoder" */;
+			buildConfigurationList = D749DF9E23234F840010C673 /* Build configuration list for PBXNativeTarget "ProMark" */;
 			buildPhases = (
 				D749DF6F23234F830010C673 /* Sources */,
 				D749DF7023234F830010C673 /* Frameworks */,
@@ -378,14 +349,14 @@
 			);
 			dependencies = (
 			);
-			name = AllCoder;
+			name = ProMark;
 			productName = AllCoder;
-			productReference = D749DF7323234F830010C673 /* AllCoder.app */;
+			productReference = D749DF7323234F830010C673 /* ProMark.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D749DF8923234F840010C673 /* AllCoderTests */ = {
+		D749DF8923234F840010C673 /* ProMarkTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D749DFA123234F840010C673 /* Build configuration list for PBXNativeTarget "AllCoderTests" */;
+			buildConfigurationList = D749DFA123234F840010C673 /* Build configuration list for PBXNativeTarget "ProMarkTests" */;
 			buildPhases = (
 				D749DF8623234F840010C673 /* Sources */,
 				D749DF8723234F840010C673 /* Frameworks */,
@@ -396,14 +367,14 @@
 			dependencies = (
 				D749DF8C23234F840010C673 /* PBXTargetDependency */,
 			);
-			name = AllCoderTests;
+			name = ProMarkTests;
 			productName = AllCoderTests;
-			productReference = D749DF8A23234F840010C673 /* AllCoderTests.xctest */;
+			productReference = D749DF8A23234F840010C673 /* ProMarkTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		D749DF9423234F840010C673 /* AllCoderUITests */ = {
+		D749DF9423234F840010C673 /* ProMarkUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D749DFA423234F840010C673 /* Build configuration list for PBXNativeTarget "AllCoderUITests" */;
+			buildConfigurationList = D749DFA423234F840010C673 /* Build configuration list for PBXNativeTarget "ProMarkUITests" */;
 			buildPhases = (
 				D749DF9123234F840010C673 /* Sources */,
 				D749DF9223234F840010C673 /* Frameworks */,
@@ -414,9 +385,9 @@
 			dependencies = (
 				D749DF9723234F840010C673 /* PBXTargetDependency */,
 			);
-			name = AllCoderUITests;
+			name = ProMarkUITests;
 			productName = AllCoderUITests;
-			productReference = D749DF9523234F840010C673 /* AllCoderUITests.xctest */;
+			productReference = D749DF9523234F840010C673 /* ProMarkUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -442,7 +413,7 @@
 					};
 				};
 			};
-			buildConfigurationList = D749DF6E23234F830010C673 /* Build configuration list for PBXProject "AllCoder" */;
+			buildConfigurationList = D749DF6E23234F830010C673 /* Build configuration list for PBXProject "ProMark" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -455,9 +426,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D749DF7223234F830010C673 /* AllCoder */,
-				D749DF8923234F840010C673 /* AllCoderTests */,
-				D749DF9423234F840010C673 /* AllCoderUITests */,
+				D749DF7223234F830010C673 /* ProMark */,
+				D749DF8923234F840010C673 /* ProMarkTests */,
+				D749DF9423234F840010C673 /* ProMarkUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -498,7 +469,6 @@
 				D7FE8B7F2326112200F4C6F5 /* TabBarView.swift in Sources */,
 				D7F06165232504830019B224 /* Folder.swift in Sources */,
 				D7305BC123278377006668B0 /* FormControlView.swift in Sources */,
-				D749DF7F23234F830010C673 /* AllCoder.xcdatamodeld in Sources */,
 				D73599DD23289B69004D985E /* NSNotification.Name+names.swift in Sources */,
 				D7F0616D23251C4C0019B224 /* Description.swift in Sources */,
 				D736D1C2232BA66A004DB6CB /* InputButton.swift in Sources */,
@@ -553,7 +523,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D749DF8F23234F840010C673 /* AllCoderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,7 +530,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D749DF9A23234F840010C673 /* AllCoderUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -570,12 +538,12 @@
 /* Begin PBXTargetDependency section */
 		D749DF8C23234F840010C673 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D749DF7223234F830010C673 /* AllCoder */;
+			target = D749DF7223234F830010C673 /* ProMark */;
 			targetProxy = D749DF8B23234F840010C673 /* PBXContainerItemProxy */;
 		};
 		D749DF9723234F840010C673 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D749DF7223234F830010C673 /* AllCoder */;
+			target = D749DF7223234F830010C673 /* ProMark */;
 			targetProxy = D749DF9623234F840010C673 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -712,15 +680,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5FF7DL6Z6Q;
-				INFOPLIST_FILE = AllCoder/Info.plist;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ProMark/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = sk.AllCoder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -730,15 +700,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5FF7DL6Z6Q;
-				INFOPLIST_FILE = AllCoder/Info.plist;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = ProMark/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = sk.AllCoder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -761,7 +733,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AllCoder.app/AllCoder";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ProMark.app/ProMark";
 			};
 			name = Debug;
 		};
@@ -782,7 +754,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AllCoder.app/AllCoder";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ProMark.app/ProMark";
 			};
 			name = Release;
 		};
@@ -829,7 +801,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D749DF6E23234F830010C673 /* Build configuration list for PBXProject "AllCoder" */ = {
+		D749DF6E23234F830010C673 /* Build configuration list for PBXProject "ProMark" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D749DF9C23234F840010C673 /* Debug */,
@@ -838,7 +810,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D749DF9E23234F840010C673 /* Build configuration list for PBXNativeTarget "AllCoder" */ = {
+		D749DF9E23234F840010C673 /* Build configuration list for PBXNativeTarget "ProMark" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D749DF9F23234F840010C673 /* Debug */,
@@ -847,7 +819,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D749DFA123234F840010C673 /* Build configuration list for PBXNativeTarget "AllCoderTests" */ = {
+		D749DFA123234F840010C673 /* Build configuration list for PBXNativeTarget "ProMarkTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D749DFA223234F840010C673 /* Debug */,
@@ -856,7 +828,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D749DFA423234F840010C673 /* Build configuration list for PBXNativeTarget "AllCoderUITests" */ = {
+		D749DFA423234F840010C673 /* Build configuration list for PBXNativeTarget "ProMarkUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D749DFA523234F840010C673 /* Debug */,
@@ -866,19 +838,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		D749DF7D23234F830010C673 /* AllCoder.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				D749DF7E23234F830010C673 /* AllCoder.xcdatamodel */,
-			);
-			currentVersion = D749DF7E23234F830010C673 /* AllCoder.xcdatamodel */;
-			path = AllCoder.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = D749DF6B23234F830010C673 /* Project object */;
 }

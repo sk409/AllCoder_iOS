@@ -230,6 +230,7 @@ fileprivate class MaterialCardView: UIView {
                 return
             }
             thumbnailImageView.fetch(path: material.thumbnailImagePath)
+            //print(thumbnailImageView.image)
             titleLabel.text = material.title
             priceLabel.text = Price(locale: .japan, value: material.price).string
             numberOfLessonsLabel.text = "全" + String(material.lessons.count) + "レッスン"
