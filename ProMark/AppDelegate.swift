@@ -9,7 +9,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        //Auth.shared.logout()
         window = UIWindow()
         window?.makeKeyAndVisible()
         if Auth.shared.isLoggedIn() {
