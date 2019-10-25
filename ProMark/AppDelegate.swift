@@ -6,12 +6,11 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
-
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow()
         window?.makeKeyAndVisible()
+        //Auth.shared.logout()
         if Auth.shared.isLoggedIn() {
             let dashboardTabBarController = DashboardTabBarController()
             dashboardTabBarController.user = Auth.shared.user

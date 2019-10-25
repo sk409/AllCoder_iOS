@@ -6,6 +6,7 @@ class Lesson: Decodable {
     let index: Int
     let title: String
     let description: String
+    let book: String
     let createdAt: String
     let updatedAt: String
     let evaluations: [Int]

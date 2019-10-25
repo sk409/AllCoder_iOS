@@ -23,14 +23,27 @@ class Auth {
                 completion?(nil)
                 return
             }
-            let jsonDecoder = JSONDecoder()
-            jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-            guard let user = try? jsonDecoder.decode(User.self, from: response) else {
+            guard let userId = String(data: response, encoding: .utf8) else {
                 completion?(nil)
                 return
             }
-            self.user = user
-            self.login(emailAddress: emailAddress, password: password) { _ in
+            let parameters = [
+                URLQueryItem(name: "id", value: userId)
+            ]
+            HTTP().async(route: .init(resource: .users, name: .index), parameters: parameters) { response in
+                guard let response = response else {
+                    completion?(nil)
+                    return
+                }
+                //print(String(data: response, encoding: .utf8))
+                let jsonDecoder = JSONDecoder()
+                jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+                guard let user = (try? jsonDecoder.decode([User].self, from: response))?.first else {
+                    completion?(nil)
+                    return
+                }
+                self.user = user
+                UserDefaults.standard.set(user.id, forKey: Auth.userIdKey)
                 completion?(self.user)
             }
         }
@@ -42,19 +55,33 @@ class Auth {
             URLQueryItem(name: "password", value: password)
         ]
         HTTP().async(route: .init(api: .login), parameters: parameters) { response in
-            defer {
+            guard let response = response else {
+                completion?(nil)
+                return
+            }
+            guard let userId = String(data: response, encoding: .utf8) else {
+                completion?(nil)
+                return
+            }
+            let parameters = [
+                URLQueryItem(name: "id", value: userId)
+            ]
+            HTTP().async(route: .init(resource: .users, name: .index), parameters: parameters) { response in
+                guard let response = response else {
+                    completion?(nil)
+                    return
+                }
+                let jsonDecoder = JSONDecoder()
+                jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+                print(String(data: response, encoding: .utf8))
+                guard let user = (try? jsonDecoder.decode([User].self, from: response))?.first else {
+                    completion?(nil)
+                    return
+                }
+                UserDefaults.standard.set(user.id, forKey: Auth.userIdKey)
+                self.user = user
                 completion?(self.user)
             }
-            guard let response = response else {
-                return
-            }
-            let jsonDecoder = JSONDecoder()
-            jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-            self.user = try? jsonDecoder.decode(User.self, from: response)
-            guard let user = self.user else {
-                return
-            }
-            UserDefaults.standard.set(user.id, forKey: Auth.userIdKey)
         }
     }
     
