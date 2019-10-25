@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4798C613805BBAC3F2F76271 /* Pods_ProMark_ProMarkUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAD6F30396DEC33921F007E4 /* Pods_ProMark_ProMarkUITests.framework */; };
+		7D3D006071FF605424F27295 /* Pods_ProMark.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E090A5479D6D69D9E0F1C3F /* Pods_ProMark.framework */; };
 		D70EB6922328A0FC0022D9C1 /* FileTreeItemHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6912328A0FC0022D9C1 /* FileTreeItemHolder.swift */; };
 		D70EB6942328A2D20022D9C1 /* FileTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6932328A2D20022D9C1 /* FileTreeView.swift */; };
 		D70EB6962328B5C60022D9C1 /* String+subscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6952328B5C60022D9C1 /* String+subscript.swift */; };
@@ -61,6 +63,7 @@
 		D7FE8B7B2325EBAC00F4C6F5 /* Locale.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7FE8B7A2325EBAC00F4C6F5 /* Locale.swift */; };
 		D7FE8B7D2325F81200F4C6F5 /* UIView+sizeThatFits.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7FE8B7C2325F81200F4C6F5 /* UIView+sizeThatFits.swift */; };
 		D7FE8B7F2326112200F4C6F5 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7FE8B7E2326112200F4C6F5 /* TabBarView.swift */; };
+		DBE86A989FD1E858280CF29A /* Pods_ProMarkTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6A7276AE8EB85F67ED8C476 /* Pods_ProMarkTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +84,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1FC16679738373D94399EF8B /* Pods-ProMarkTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMarkTests.debug.xcconfig"; path = "Target Support Files/Pods-ProMarkTests/Pods-ProMarkTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5E090A5479D6D69D9E0F1C3F /* Pods_ProMark.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ProMark.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8CB5CB6E6A0289501497641F /* Pods-ProMark.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMark.release.xcconfig"; path = "Target Support Files/Pods-ProMark/Pods-ProMark.release.xcconfig"; sourceTree = "<group>"; };
+		BAD6F30396DEC33921F007E4 /* Pods_ProMark_ProMarkUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ProMark_ProMarkUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D70EB6912328A0FC0022D9C1 /* FileTreeItemHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeItemHolder.swift; sourceTree = "<group>"; };
 		D70EB6932328A2D20022D9C1 /* FileTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeView.swift; sourceTree = "<group>"; };
 		D70EB6952328B5C60022D9C1 /* String+subscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+subscript.swift"; sourceTree = "<group>"; };
@@ -139,6 +146,11 @@
 		D7FE8B7A2325EBAC00F4C6F5 /* Locale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Locale.swift; sourceTree = "<group>"; };
 		D7FE8B7C2325F81200F4C6F5 /* UIView+sizeThatFits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+sizeThatFits.swift"; sourceTree = "<group>"; };
 		D7FE8B7E2326112200F4C6F5 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
+		D8F3B5D60A42650755B11DE8 /* Pods-ProMarkTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMarkTests.release.xcconfig"; path = "Target Support Files/Pods-ProMarkTests/Pods-ProMarkTests.release.xcconfig"; sourceTree = "<group>"; };
+		DBA06E9AD87319D196867DD0 /* Pods-ProMark.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMark.debug.xcconfig"; path = "Target Support Files/Pods-ProMark/Pods-ProMark.debug.xcconfig"; sourceTree = "<group>"; };
+		E4B4AE3781F4E625CBF79FB3 /* Pods-ProMark-ProMarkUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMark-ProMarkUITests.release.xcconfig"; path = "Target Support Files/Pods-ProMark-ProMarkUITests/Pods-ProMark-ProMarkUITests.release.xcconfig"; sourceTree = "<group>"; };
+		E645E24183435CF3C439E88B /* Pods-ProMark-ProMarkUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ProMark-ProMarkUITests.debug.xcconfig"; path = "Target Support Files/Pods-ProMark-ProMarkUITests/Pods-ProMark-ProMarkUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		F6A7276AE8EB85F67ED8C476 /* Pods_ProMarkTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ProMarkTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +158,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D3D006071FF605424F27295 /* Pods_ProMark.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +166,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBE86A989FD1E858280CF29A /* Pods_ProMarkTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,12 +174,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4798C613805BBAC3F2F76271 /* Pods_ProMark_ProMarkUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A96E439C9192A7D46C4E1D94 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5E090A5479D6D69D9E0F1C3F /* Pods_ProMark.framework */,
+				BAD6F30396DEC33921F007E4 /* Pods_ProMark_ProMarkUITests.framework */,
+				F6A7276AE8EB85F67ED8C476 /* Pods_ProMarkTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B2B12E1ECFC0772FD17BE680 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				DBA06E9AD87319D196867DD0 /* Pods-ProMark.debug.xcconfig */,
+				8CB5CB6E6A0289501497641F /* Pods-ProMark.release.xcconfig */,
+				E645E24183435CF3C439E88B /* Pods-ProMark-ProMarkUITests.debug.xcconfig */,
+				E4B4AE3781F4E625CBF79FB3 /* Pods-ProMark-ProMarkUITests.release.xcconfig */,
+				1FC16679738373D94399EF8B /* Pods-ProMarkTests.debug.xcconfig */,
+				D8F3B5D60A42650755B11DE8 /* Pods-ProMarkTests.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		D73059652329CC0500B8A420 /* SyntaxHighlighters */ = {
 			isa = PBXGroup;
 			children = (
@@ -225,6 +264,8 @@
 			children = (
 				D749DF7523234F830010C673 /* ProMark */,
 				D749DF7423234F830010C673 /* Products */,
+				B2B12E1ECFC0772FD17BE680 /* Pods */,
+				A96E439C9192A7D46C4E1D94 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -341,9 +382,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D749DF9E23234F840010C673 /* Build configuration list for PBXNativeTarget "ProMark" */;
 			buildPhases = (
+				1F2F90BC59702DF1D417DCBE /* [CP] Check Pods Manifest.lock */,
 				D749DF6F23234F830010C673 /* Sources */,
 				D749DF7023234F830010C673 /* Frameworks */,
 				D749DF7123234F830010C673 /* Resources */,
+				CC0012D82955DAFB26039463 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -358,6 +401,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D749DFA123234F840010C673 /* Build configuration list for PBXNativeTarget "ProMarkTests" */;
 			buildPhases = (
+				533C389EFDE051C38076E497 /* [CP] Check Pods Manifest.lock */,
 				D749DF8623234F840010C673 /* Sources */,
 				D749DF8723234F840010C673 /* Frameworks */,
 				D749DF8823234F840010C673 /* Resources */,
@@ -376,9 +420,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D749DFA423234F840010C673 /* Build configuration list for PBXNativeTarget "ProMarkUITests" */;
 			buildPhases = (
+				46E3E6F024009119324A6EDF /* [CP] Check Pods Manifest.lock */,
 				D749DF9123234F840010C673 /* Sources */,
 				D749DF9223234F840010C673 /* Frameworks */,
 				D749DF9323234F840010C673 /* Resources */,
+				0B7B8476F79635228DFB3727 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -458,6 +504,109 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0B7B8476F79635228DFB3727 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ProMark-ProMarkUITests/Pods-ProMark-ProMarkUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ProMark-ProMarkUITests/Pods-ProMark-ProMarkUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ProMark-ProMarkUITests/Pods-ProMark-ProMarkUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1F2F90BC59702DF1D417DCBE /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ProMark-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		46E3E6F024009119324A6EDF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ProMark-ProMarkUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		533C389EFDE051C38076E497 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ProMarkTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CC0012D82955DAFB26039463 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ProMark/Pods-ProMark-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ProMark/Pods-ProMark-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ProMark/Pods-ProMark-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D749DF6F23234F830010C673 /* Sources */ = {
@@ -678,6 +827,7 @@
 		};
 		D749DF9F23234F840010C673 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DBA06E9AD87319D196867DD0 /* Pods-ProMark.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -698,6 +848,7 @@
 		};
 		D749DFA023234F840010C673 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8CB5CB6E6A0289501497641F /* Pods-ProMark.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -718,6 +869,7 @@
 		};
 		D749DFA223234F840010C673 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1FC16679738373D94399EF8B /* Pods-ProMarkTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -739,6 +891,7 @@
 		};
 		D749DFA323234F840010C673 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D8F3B5D60A42650755B11DE8 /* Pods-ProMarkTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -760,6 +913,7 @@
 		};
 		D749DFA523234F840010C673 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E645E24183435CF3C439E88B /* Pods-ProMark-ProMarkUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -780,6 +934,7 @@
 		};
 		D749DFA623234F840010C673 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E4B4AE3781F4E625CBF79FB3 /* Pods-ProMark-ProMarkUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;

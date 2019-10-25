@@ -1,7 +1,7 @@
 import UIKit
+import MarkdownView
 
 class LessonViewController: UIViewController {
-    
     
     override var prefersStatusBarHidden: Bool {
         return true
@@ -15,30 +15,30 @@ class LessonViewController: UIViewController {
         return [.landscapeLeft, .landscapeRight]
     }
     
-    var lesson: Lesson? {
-        didSet {
-            codeEditorViews.removeAll(keepingCapacity: true)
-            releasedDescriptions.removeAll(keepingCapacity: true)
-            questions.removeAll(keepingCapacity: true)
-            focusFrames.removeAll(keepingCapacity: true)
-            fileTreeView.rootFolder = lesson?.rootFolder
-            //codeEditorView.set(file: lesson?.rootFolder?.childFiles.first)
-            if let rootFolder = lesson?.rootFolder {
-                var folders = [rootFolder]
-                while !folders.isEmpty {
-                    let folder = folders.popLast()!
-                    let describedFiles = folder.childFiles.filter { $0.index != nil }
-                    codeEditorViews.append(contentsOf: describedFiles.map { describedFile in
-                        let codeEditorView = CodeEditorView()
-                        codeEditorView.set(file: describedFile)
-                        return codeEditorView
-                    })
-                    folders.append(contentsOf: folder.childFolders)
-                }
-            }
-            releaseDescriptions()
-        }
-    }
+    var lesson: Lesson? //{
+//        didSet {
+//            codeEditorViews.removeAll(keepingCapacity: true)
+//            releasedDescriptions.removeAll(keepingCapacity: true)
+//            questions.removeAll(keepingCapacity: true)
+//            focusFrames.removeAll(keepingCapacity: true)
+//            fileTreeView.rootFolder = lesson?.rootFolder
+//            //codeEditorView.set(file: lesson?.rootFolder?.childFiles.first)
+//            if let rootFolder = lesson?.rootFolder {
+//                var folders = [rootFolder]
+//                while !folders.isEmpty {
+//                    let folder = folders.popLast()!
+//                    let describedFiles = folder.childFiles.filter { $0.index != nil }
+//                    codeEditorViews.append(contentsOf: describedFiles.map { describedFile in
+//                        let codeEditorView = CodeEditorView()
+//                        codeEditorView.set(file: describedFile)
+//                        return codeEditorView
+//                    })
+//                    folders.append(contentsOf: folder.childFolders)
+//                }
+//            }
+//            releaseDescriptions()
+//        }
+    //}
     
     private var keyboardViewTrailingConstraint: NSLayoutConstraint?
     private var descriptionCollectionViewTopConstraint: NSLayoutConstraint?
@@ -79,61 +79,72 @@ class LessonViewController: UIViewController {
         addObservers()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        showDescriptionCollectionView()
-        codeEditorView?.alpha = 1
-        codeEditorViews.forEach { $0.contentSize.height += descriptionCollectionView.bounds.height }
-    }
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        showDescriptionCollectionView()
+//        codeEditorView?.alpha = 1
+//        codeEditorViews.forEach { $0.contentSize.height += descriptionCollectionView.bounds.height }
+//    }
     
+    /*********************/
+    // TEST
+    let markdownView = MarkdownView()
     private func setupViews() {
-        view.backgroundColor = .black
-        view.addSubview(fileTreeView)
-        codeEditorViews.forEach { view.addSubview($0) }
-        view.addSubview(keyboardView)
-        view.addSubview(descriptionCollectionView)
-        fileTreeView.backgroundColor = UIColor(red: 48/255, green: 50/255, blue: 61/255, alpha: 1)
-        fileTreeView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            fileTreeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            fileTreeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            fileTreeView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            fileTreeView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.3)
-            ])
-        for codeEditorView in codeEditorViews {
-            codeEditorView.alpha = 0
-            codeEditorView.backgroundColor = .black
-            codeEditorView.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                codeEditorView.leadingAnchor.constraint(equalTo: fileTreeView.trailingAnchor),
-                codeEditorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-                codeEditorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                codeEditorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-                ])
-        }
-        keyboardView.backgroundColor = UIColor(red: 50/255, green: 50/255, blue: 50/255, alpha: 1)
-        keyboardViewTrailingConstraint = keyboardView.trailingAnchor.constraint(equalTo: view.leadingAnchor)
-        keyboardView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            keyboardViewTrailingConstraint!,
-            keyboardView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            keyboardView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            keyboardView.widthAnchor.constraint(equalTo: fileTreeView.widthAnchor),
-            ])
-        descriptionCollectionView.dataSource = self
-        descriptionCollectionView.delegate = self
-        descriptionCollectionView.isPagingEnabled = true
-        descriptionCollectionView.bounces = false
-        descriptionCollectionView.register(DescriptionCollectionViewCell.self, forCellWithReuseIdentifier: DescriptionCollectionViewCell.className)
-        descriptionCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        descriptionCollectionViewTopConstraint = descriptionCollectionView.topAnchor.constraint(equalTo: view.bottomAnchor)
-        NSLayoutConstraint.activate([
-            descriptionCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            descriptionCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            descriptionCollectionViewTopConstraint!,
-            descriptionCollectionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.45),
-            ])
+        print(lesson?.book)
+        view.addSubview(markdownView)
+        markdownView.frame = view.frame
+        markdownView.load(markdown: lesson?.book)
     }
+    /*********************/
+    
+//    private func setupViews() {
+//        view.backgroundColor = .black
+//        view.addSubview(fileTreeView)
+//        codeEditorViews.forEach { view.addSubview($0) }
+//        view.addSubview(keyboardView)
+//        view.addSubview(descriptionCollectionView)
+//        fileTreeView.backgroundColor = UIColor(red: 48/255, green: 50/255, blue: 61/255, alpha: 1)
+//        fileTreeView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            fileTreeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+//            fileTreeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+//            fileTreeView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+//            fileTreeView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.3)
+//            ])
+//        for codeEditorView in codeEditorViews {
+//            codeEditorView.alpha = 0
+//            codeEditorView.backgroundColor = .black
+//            codeEditorView.translatesAutoresizingMaskIntoConstraints = false
+//            NSLayoutConstraint.activate([
+//                codeEditorView.leadingAnchor.constraint(equalTo: fileTreeView.trailingAnchor),
+//                codeEditorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+//                codeEditorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+//                codeEditorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+//                ])
+//        }
+//        keyboardView.backgroundColor = UIColor(red: 50/255, green: 50/255, blue: 50/255, alpha: 1)
+//        keyboardViewTrailingConstraint = keyboardView.trailingAnchor.constraint(equalTo: view.leadingAnchor)
+//        keyboardView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            keyboardViewTrailingConstraint!,
+//            keyboardView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+//            keyboardView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+//            keyboardView.widthAnchor.constraint(equalTo: fileTreeView.widthAnchor),
+//            ])
+//        descriptionCollectionView.dataSource = self
+//        descriptionCollectionView.delegate = self
+//        descriptionCollectionView.isPagingEnabled = true
+//        descriptionCollectionView.bounces = false
+//        descriptionCollectionView.register(DescriptionCollectionViewCell.self, forCellWithReuseIdentifier: DescriptionCollectionViewCell.className)
+//        descriptionCollectionView.translatesAutoresizingMaskIntoConstraints = false
+//        descriptionCollectionViewTopConstraint = descriptionCollectionView.topAnchor.constraint(equalTo: view.bottomAnchor)
+//        NSLayoutConstraint.activate([
+//            descriptionCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+//            descriptionCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+//            descriptionCollectionViewTopConstraint!,
+//            descriptionCollectionView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.45),
+//            ])
+//    }
     
     private func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(observeTapFileViewNotification(_:)), name: .fileViewTapped, object: nil)
