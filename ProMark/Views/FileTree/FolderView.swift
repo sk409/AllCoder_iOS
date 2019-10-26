@@ -42,7 +42,7 @@ class FolderView: FileTreeItemView, FileTreeItemHolder {
     
     func set(folder: Folder) -> CGSize {
         self.folder = folder
-        set(name: folder.name)
+        set(path: folder.path)
         var size = nameLabel.fitSize
         for child in folder.childFolders {
             let childSize = append(child: child)

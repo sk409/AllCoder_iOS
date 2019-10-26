@@ -18,7 +18,7 @@ class FileView: FileTreeItemView {
     
     func set(file: File) -> CGSize {
         self.file = file
-        set(name: file.name)
+        set(path: file.path)
         return nameLabel.fitSize
     }
     

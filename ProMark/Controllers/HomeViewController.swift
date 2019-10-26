@@ -39,6 +39,7 @@ class HomeViewController: UIViewController {
             let jsonDecoder = JSONDecoder()
             jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
             self.user = (try? jsonDecoder.decode([User].self, from: response))?.first
+            //print(self.user)
             self.purchasedMaterialsTableView.materials = self.user?.purchasedMaterials
             self.purchasedMaterialsTableView.lessonCompletions = self.user?.lessonCompletions
             DispatchQueue.main.async {

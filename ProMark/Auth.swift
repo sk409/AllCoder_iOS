@@ -73,7 +73,7 @@ class Auth {
                 }
                 let jsonDecoder = JSONDecoder()
                 jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-                print(String(data: response, encoding: .utf8))
+                //print(String(data: response, encoding: .utf8))
                 guard let user = (try? jsonDecoder.decode([User].self, from: response))?.first else {
                     completion?(nil)
                     return

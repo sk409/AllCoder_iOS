@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -43,6 +43,7 @@
 		D749DFB62323660E0010C673 /* MaterialSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D749DFB52323660E0010C673 /* MaterialSearchViewController.swift */; };
 		D774F5212330B29300D96899 /* UIView+blackout+whiteout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D774F5202330B29300D96899 /* UIView+blackout+whiteout.swift */; };
 		D774F5232330B97D00D96899 /* UIImageView+fetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = D774F5222330B97D00D96899 /* UIImageView+fetch.swift */; };
+		D7961BEF23646109004F71CE /* FileOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7961BEE23646108004F71CE /* FileOption.swift */; };
 		D7AFE954232E32AD00CE68D7 /* LessonCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7AFE953232E32AD00CE68D7 /* LessonCompletion.swift */; };
 		D7AFE956232E3A7F00CE68D7 /* IndexPathButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7AFE955232E3A7F00CE68D7 /* IndexPathButton.swift */; };
 		D7F0615123236B7B0019B224 /* UIFont+AppFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F0615023236B7B0019B224 /* UIFont+AppFonts.swift */; };
@@ -126,6 +127,7 @@
 		D749DFB52323660E0010C673 /* MaterialSearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaterialSearchViewController.swift; sourceTree = "<group>"; };
 		D774F5202330B29300D96899 /* UIView+blackout+whiteout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+blackout+whiteout.swift"; sourceTree = "<group>"; };
 		D774F5222330B97D00D96899 /* UIImageView+fetch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+fetch.swift"; sourceTree = "<group>"; };
+		D7961BEE23646108004F71CE /* FileOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileOption.swift; sourceTree = "<group>"; };
 		D7AFE953232E32AD00CE68D7 /* LessonCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonCompletion.swift; sourceTree = "<group>"; };
 		D7AFE955232E3A7F00CE68D7 /* IndexPathButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexPathButton.swift; sourceTree = "<group>"; };
 		D7F0615023236B7B0019B224 /* UIFont+AppFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+AppFonts.swift"; sourceTree = "<group>"; };
@@ -201,7 +203,6 @@
 				1FC16679738373D94399EF8B /* Pods-ProMarkTests.debug.xcconfig */,
 				D8F3B5D60A42650755B11DE8 /* Pods-ProMarkTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -344,6 +345,7 @@
 				D7F0617023251DA50019B224 /* Question.swift */,
 				D736D1C1232BA66A004DB6CB /* InputButton.swift */,
 				D7AFE953232E32AD00CE68D7 /* LessonCompletion.swift */,
+				D7961BEE23646108004F71CE /* FileOption.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -655,6 +657,7 @@
 				D7FE8B792325EB9900F4C6F5 /* Price.swift in Sources */,
 				D7305BBF2327833F006668B0 /* FormView.swift in Sources */,
 				D7F06169232511C50019B224 /* LessonComment.swift in Sources */,
+				D7961BEF23646109004F71CE /* FileOption.swift in Sources */,
 				D774F5232330B97D00D96899 /* UIImageView+fetch.swift in Sources */,
 				D70EB6942328A2D20022D9C1 /* FileTreeView.swift in Sources */,
 				D7F0617123251DA50019B224 /* Question.swift in Sources */,

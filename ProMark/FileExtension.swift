@@ -3,7 +3,9 @@ enum FileExtension: String {
     case html
     
     init?(file: File) {
-        guard let e = file.name.split(separator: ".").last else {
+//        print((file.path.split(separator: "/")))
+//        print((file.path.split(separator: "/")).last?.split(separator: "."))
+        guard let e = (file.path.split(separator: "/")).last?.split(separator: ".").last else {
             return nil
         }
         guard let fileExtension = FileExtension(rawValue: String(e)) else {

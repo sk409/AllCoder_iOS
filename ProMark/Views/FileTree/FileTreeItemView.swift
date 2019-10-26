@@ -18,8 +18,8 @@ class FileTreeItemView: UIView {
         setupViews()
     }
     
-    func set(name: String) {
-        nameLabel.text = name
+    func set(path: String) {
+        nameLabel.text = String(path.split(separator: "/").last ?? "")
         nameLabel.textColor = .white
         nameLabel.frame.size = nameLabel.fitSize
     }

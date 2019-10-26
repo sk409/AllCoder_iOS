@@ -2,13 +2,13 @@ import UIKit
 
 class DashboardTabBarController: UITabBarController {
     
-    override var shouldAutorotate: Bool {
-        return true
-    }
-    
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return [.portrait, .portraitUpsideDown]
-    }
+//    override var shouldAutorotate: Bool {
+//        return true
+//    }
+//    
+//    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+//        return [.portrait, .portraitUpsideDown]
+//    }
     
     var user: User? {
         didSet {
