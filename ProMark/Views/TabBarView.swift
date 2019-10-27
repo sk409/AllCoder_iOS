@@ -2,6 +2,14 @@ import UIKit
 
 class TabBarView: UIView {
     
+    var selectedTabIndex = 0 {
+        didSet {
+            contentCollectionView.scrollToItem(at: IndexPath(item: selectedTabIndex, section: 0), at: .left, animated: true)
+        }
+    }
+    
+    let tabBarView = UIView()
+    let tabUnderLineView = UIView()
     let contentCollectionView = UICollectionView(frame: .zero, collectionViewLayout: {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -12,9 +20,7 @@ class TabBarView: UIView {
     
     private var tabUnderLineViewLeadingConstraint: NSLayoutConstraint?
     private var tabUnserLineViewWidthConstraint: NSLayoutConstraint?
-    private let tabBarView = UIView()
     private let tabsStackView = UIStackView()
-    private let tabUnderLineView = UIView()
     
     
     override init(frame: CGRect) {
@@ -93,7 +99,7 @@ class TabBarView: UIView {
     
     @objc
     private func onTouchUpInsideTabButton(_ sender: UIButton) {
-        contentCollectionView.scrollToItem(at: IndexPath(item: sender.tag, section: 0), at: .left, animated: true)
+        selectedTabIndex = sender.tag
     }
     
 }

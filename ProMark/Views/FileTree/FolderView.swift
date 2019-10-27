@@ -20,9 +20,10 @@ class FolderView: FileTreeItemView, FileTreeItemHolder {
     
     var parent: FileTreeItemHolder?
     
+    private(set) var children = [FileTreeItemView]()
+    
     private var isExpanded = true
     private var folder: Folder?
-    private var children = [FileTreeItemView]()
     private var heightConstraint: NSLayoutConstraint?
     
     override init(frame: CGRect) {
@@ -83,6 +84,16 @@ class FolderView: FileTreeItemView, FileTreeItemHolder {
         return size
     }
     
+    func toggle() {
+        isExpanded = !isExpanded
+        var constant: CGFloat = 0
+        for child in children {
+            child.isHidden = !child.isHidden
+            constant += (child.isHidden ? -child.bounds.height : child.bounds.height)
+        }
+        stretch(constant: constant)
+    }
+    
     private func addGestureRecognizers() {
         nameLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap(_:))))
     }
@@ -99,13 +110,7 @@ class FolderView: FileTreeItemView, FileTreeItemHolder {
     
     @objc
     private func onTap(_ sender: UITapGestureRecognizer) {
-        isExpanded = !isExpanded
-        var constant: CGFloat = 0
-        for child in children {
-            child.isHidden = !child.isHidden
-            constant += (child.isHidden ? -child.bounds.height : child.bounds.height)
-        }
-        stretch(constant: constant)
+        toggle()
     }
     
 }

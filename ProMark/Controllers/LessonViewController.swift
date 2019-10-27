@@ -21,7 +21,9 @@ class LessonViewController: UIViewController {
         }
     }
     
+    private let sideTabBarView = TabBarView()
     private let fileTreeView = FileTreeView()
+    private let keyboardView = KeyboardView()
     private let codeEditorView = CodeEditorView()
     
     override func viewDidLoad() {
@@ -32,20 +34,26 @@ class LessonViewController: UIViewController {
     
     private func setupViews() {
         view.backgroundColor = .black
-        view.addSubview(fileTreeView)
+        view.addSubview(sideTabBarView)
         view.addSubview(codeEditorView)
-        fileTreeView.backgroundColor = .lightGray
-        fileTreeView.translatesAutoresizingMaskIntoConstraints = false
+        let sideViewBackgroundColor = UIColor(red: 51/255, green: 58/255, blue: 73/255, alpha: 1)
+        fileTreeView.backgroundColor = sideViewBackgroundColor
+        keyboardView.backgroundColor = sideViewBackgroundColor
+        sideTabBarView.set(contentViews: ["ファイルツリー": fileTreeView, "入力ボタン": keyboardView])
+        sideTabBarView.tabBarView.backgroundColor = UIColor(red: 47/255, green: 53/255, blue: 69/255, alpha: 1)
+        sideTabBarView.tabUnderLineView.backgroundColor = .white
+        sideTabBarView.contentCollectionView.isScrollEnabled = false
+        sideTabBarView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            fileTreeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            fileTreeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            fileTreeView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            fileTreeView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.3),
+            sideTabBarView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            sideTabBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            sideTabBarView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            sideTabBarView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.3),
         ])
         codeEditorView.backgroundColor = .black
         codeEditorView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            codeEditorView.leadingAnchor.constraint(equalTo: fileTreeView.trailingAnchor),
+            codeEditorView.leadingAnchor.constraint(equalTo: sideTabBarView.trailingAnchor),
             codeEditorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             codeEditorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             codeEditorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -76,7 +84,53 @@ class LessonViewController: UIViewController {
             return
         }
         codeEditorView.set(file: file)
-//        changeCodeEditorView(fileId: file.id)
+        codeEditorView.questionFrameViews.forEach { $0.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapQuestionFrameView(_:))))}
+    }
+    
+    @objc
+    private func onTapQuestionFrameView(_ sender: UITapGestureRecognizer) {
+        guard let tappedQuestionFrameView = sender.view as? QuestionFrameView else {
+            return
+        }
+        var counter = [NSAttributedString: Int]()
+        for questionFrameView in codeEditorView.questionFrameViews {
+            if let id1 = tappedQuestionFrameView.questionId,
+                let id2 = questionFrameView.questionId,
+                id1 == id2
+            {
+                questionFrameView.layer.borderColor = Appearance.CodeEditor.activeColor.cgColor
+                if /*let file = codeEditorView.file,*/
+                    let startIndex = questionFrameView.startIndex,
+                    let endIndex = questionFrameView.endIndex
+                {
+                    let attributedSubstring = codeEditorView.syntaxhighlightedText.attributedSubstring(from: NSRange(location: startIndex, length: endIndex - startIndex))
+                    if let count = counter[attributedSubstring] {
+                        counter[attributedSubstring] = count + 1
+                    } else {
+                        counter[attributedSubstring] = 0
+                    }
+//                    var location = startIndex
+//                    var length = 0
+//                    for character in file.text[startIndex..<endIndex] {
+//                        if character == " " {
+//                            let attributedSubstring = codeEditorView.syntaxhighlightedText.attributedSubstring(from: NSRange(location: location, length: length))
+//                            if let count = counter[attributedSubstring] {
+//                                counter[attributedSubstring] = count + 1
+//                            } else {
+//                                counter[attributedSubstring] = 0
+//                            }
+//                            location += length
+//                            length = 0
+//                        }
+//                        length += 1
+//                    }
+                }
+            } else {
+                questionFrameView.layer.borderColor = Appearance.CodeEditor.textColor.cgColor
+            }
+        }
+        keyboardView.counter = counter
+        sideTabBarView.selectedTabIndex = 1
     }
     
     @objc
@@ -138,18 +192,11 @@ class LessonViewController: UIViewController {
     
 }
 
-
-fileprivate struct Frame {
+fileprivate class QuestionFrameView: UIView {
     
-    let borderViews: [UIView]
-    
-    init(_ borderViews: [UIView]) {
-        self.borderViews = borderViews
-    }
-    
-    func remove() {
-        borderViews.forEach { $0.removeFromSuperview() }
-    }
+    var questionId: Int?
+    var startIndex: Int?
+    var endIndex: Int?
     
 }
 
@@ -166,22 +213,6 @@ fileprivate class CodeEditorView: UIScrollView {
             self.attributedText = attributedText
             self.range = range
         }
-    }
-    
-    private struct QuestionFrame {
-        
-        let questionId: Int
-        let borderViews: [UIView]
-        
-        init(questionId: Int, borderViews: [UIView]) {
-            self.questionId = questionId
-            self.borderViews = borderViews
-        }
-        
-        func remove() {
-            borderViews.forEach { $0.removeFromSuperview() }
-        }
-        
     }
     
     var insets = UIEdgeInsets(
@@ -214,8 +245,9 @@ fileprivate class CodeEditorView: UIScrollView {
     
     private(set) var file: File?
     private(set) var answers = [Answer]()
+    private(set) var questionFrameViews = [QuestionFrameView]()
+    private(set) var syntaxhighlightedText = NSMutableAttributedString(string: "")
     
-    private var questionFrames = [QuestionFrame]()
     private let codeTextView = UITextView()
     private let caretView = CaretView()
     
@@ -237,50 +269,29 @@ fileprivate class CodeEditorView: UIScrollView {
 //        guard let syntaxHighlightedText = SyntaxHighlighter.highlight(file: file) else {
 //            return
 //        }
-        let syntaxHighlightedText = NSMutableAttributedString(string: file.text)
-        syntaxHighlightedText.addAttributes(
-            textAttributes,
-            range: NSRange(location: 0, length: syntaxHighlightedText.string.count)
-        )
+        let syntaxhighlightedText = NSMutableAttributedString(string: file.text, attributes: textAttributes)
+        self.syntaxhighlightedText = NSMutableAttributedString(attributedString: syntaxhighlightedText)
         answers.removeAll(keepingCapacity: true)
-        questionFrames.forEach { $0.remove() }
-        questionFrames.removeAll(keepingCapacity: true)
-//        let questions = file.descriptions.flatMap { $0.questions }
-//        for question in questions {
-//            for inputButton in question.inputButtons {
-//                let range = NSRange(
-//                    location: inputButton.startIndex,
-//                    length: inputButton.endIndex - inputButton.startIndex
-//                )
-//                answers.append(Answer(
-//                    questionId: question.id,
-//                    inputButtonId: inputButton.id,
-//                    attributedText: syntaxHighlightedText.attributedSubstring(from: range),
-//                    range: range
-//                ))
-//                syntaxHighlightedText.addAttributes(
-//                    [.foregroundColor: UIColor.clear],
-//                    range: range
-//                )
-//            }
-//            let group = Dictionary(grouping: question.inputButtons) { inputButton in
-//                return inputButton.lineNumber
-//            }
-//            for inputButtons in group.values {
-//                if let frame = addFrame(
-//                    startIndex: inputButtons.reduce(Int.max, { min($0, $1.startIndex)}),
-//                    endIndex: inputButtons.reduce(0, { max($0, $1.endIndex) })
-//                ) {
-//                    questionFrames.append(QuestionFrame(
-//                        questionId: question.id,
-//                        borderViews: frame.borderViews
-//                    ))
-//                }
-//            }
-//        }
-        //codeTextView.attributedText = syntaxHighlightedText
-        codeTextView.textColor = .white
-        codeTextView.text = file.text
+        questionFrameViews.forEach { $0.removeFromSuperview() }
+        questionFrameViews.removeAll(keepingCapacity: true)
+        if let questions = file.option?.questions {
+            for question in questions {
+                questionFrameViews.append(contentsOf: addQuestionFrameViews(
+                    id: question.id,
+                    startIndex: question.startIndex,
+                    endIndex: question.endIndex
+                ))
+                syntaxhighlightedText.addAttributes(
+                    [.foregroundColor: UIColor.clear],
+                    range: NSRange(
+                        location: question.startIndex,
+                        length: question.endIndex - question.startIndex
+                    )
+                )
+
+            }
+        }
+        codeTextView.attributedText = syntaxhighlightedText
         let codeTextViewSize = codeTextView.fitSize
         codeTextView.frame = CGRect(
             x: insets.left,
@@ -307,53 +318,65 @@ fileprivate class CodeEditorView: UIScrollView {
         }
     }
     
-    func addFrame(
+    func addQuestionFrameViews(
+        id: Int,
         startIndex: Int,
         endIndex: Int,
         color: UIColor = Appearance.CodeEditor.textColor
-    ) -> Frame? {
+    ) -> [QuestionFrameView]
+    {
+        guard let file = file else {
+            return []
+        }
+        var questionFrameViews = [QuestionFrameView]()
+        var s = startIndex
+        var e = startIndex
+        let addQuestionFrameView = {
+            guard let questionFrameView = self.addQuestionFrameView(id: id, startIndex: s, endIndex: e) else {
+                return
+            }
+            questionFrameViews.append(questionFrameView)
+        }
+        for character in file.text[startIndex..<endIndex] {
+            if character == "\n" {
+                if s != e {
+                    addQuestionFrameView()
+                }
+                s = e + 1
+            }
+            e += 1
+        }
+        addQuestionFrameView()
+        return questionFrameViews
+    }
+    
+    func addQuestionFrameView(
+        id: Int,
+        startIndex: Int,
+        endIndex: Int,
+        color: UIColor = Appearance.CodeEditor.textColor
+    ) -> QuestionFrameView?
+    {
         guard let file = file else {
             return nil
-        }
-        var borderViews = [UIView]()
-        let makeBorderView = { () -> UIView in
-            let borderView = UIView()
-            self.addSubview(borderView)
-            borderViews.append(borderView)
-            borderView.backgroundColor = color
-            return borderView
         }
         let borderSize = UIFont.tiny.pointSize * 0.1
         let head = file.text[...startIndex].split(separator: "\n").last
         let line = file.text[startIndex..<endIndex]
         let lineSize = textSize(String(line))
-        let x = (head != nil) ?
+        let x = ((head != nil) ?
             (textSize(String(head!)).width - textSize(String(file.text[startIndex])).width) :
-            CGFloat(0)
-        let y = textSize(upTo: startIndex, omittingLastLine: true).height
-        let leftBorderView = makeBorderView()
-        leftBorderView.frame.origin.x = x
-        leftBorderView.frame.origin.y = y
-        leftBorderView.frame.size.width = borderSize
-        leftBorderView.frame.size.height = lineSize.height
-        let topBorderView = makeBorderView()
-        topBorderView.frame.origin.x = leftBorderView.frame.maxX
-        topBorderView.frame.origin.y = y
-        topBorderView.frame.size.width = lineSize.width
-        topBorderView.frame.size.height = borderSize
-        let rightBorderView = makeBorderView()
-        rightBorderView.frame.origin.x = topBorderView.frame.maxX
-        rightBorderView.frame.origin.y = y
-        rightBorderView.frame.size = leftBorderView.bounds.size
-        let bottomBorderView = makeBorderView()
-        bottomBorderView.frame.origin.x = topBorderView.frame.origin.x
-        bottomBorderView.frame.origin.y = leftBorderView.frame.maxY - borderSize
-        bottomBorderView.frame.size = topBorderView.bounds.size
-        for borderView in borderViews {
-            borderView.frame.origin.x += insets.left
-            borderView.frame.origin.y += insets.top
-        }
-        return Frame(borderViews)
+            CGFloat(0)) + insets.left
+        let y = textSize(upTo: startIndex, omittingLastLine: true).height + insets.top
+        let questionFrameView = QuestionFrameView()
+        addSubview(questionFrameView)
+        questionFrameView.questionId = id
+        questionFrameView.startIndex = startIndex
+        questionFrameView.endIndex = endIndex
+        questionFrameView.layer.borderWidth = borderSize
+        questionFrameView.layer.borderColor = color.cgColor
+        questionFrameView.frame = CGRect(x: x, y: y, width: lineSize.width, height: lineSize.height)
+        return questionFrameView
     }
     
     func textSize(upTo index: Int, omittingLastLine: Bool = false) -> CGSize {
@@ -407,11 +430,11 @@ fileprivate class CodeEditorView: UIScrollView {
     }
     
     func activateQuestion(id: Int) {
-        questionFrames.filter { $0.questionId == id}.forEach { $0.borderViews.forEach { $0.backgroundColor = Appearance.CodeEditor.activeColor }}
+//        questionFrames.filter { $0.questionId == id}.forEach { $0.borderViews.forEach { $0.backgroundColor = Appearance.CodeEditor.activeColor }}
     }
 
     func deactivateQuestion(id: Int) {
-        questionFrames.filter { $0.questionId == id}.forEach { $0.borderViews.forEach { $0.backgroundColor = Appearance.CodeEditor.inactiveColor }}
+//        questionFrames.filter { $0.questionId == id}.forEach { $0.borderViews.forEach { $0.backgroundColor = Appearance.CodeEditor.inactiveColor }}
     }
     
     func showCaret() {
@@ -473,72 +496,6 @@ fileprivate class CodeEditorView: UIScrollView {
 }
 
 
-fileprivate class DescriptionCollectionViewCell: UICollectionViewCell {
-    
-    enum Mode {
-        case text
-        case button
-    }
-    
-    static let className = "DescriptionCollectionViewCell"
-    
-    let button = UIButton()
-    
-    var data: Description? {
-        didSet {
-            textLabel.text = data?.text
-        }
-    }
-    var mode: Mode = .text {
-        didSet {
-            textLabel.isHidden = mode != .text
-            button.isHidden = !textLabel.isHidden
-        }
-    }
-    var buttonTitle: String? {
-        didSet {
-            guard let buttonTitle = buttonTitle else {
-                return
-            }
-            button.setTitle(buttonTitle, for: .normal)
-            let sizeThatFits = button.fitSize
-            button.frame.size.width = sizeThatFits.width * 1.5
-            button.frame.size.height = sizeThatFits.height * 1.5
-            button.frame.origin.x = (bounds.width / 2) - (button.bounds.width / 2)
-            button.frame.origin.y = (bounds.height / 2) - (button.bounds.height / 2)
-        }
-    }
-    
-    private let textLabel = UILabel()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupViews()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        setupViews()
-    }
-    
-    private func setupViews() {
-        addSubview(textLabel)
-        addSubview(button)
-        textLabel.numberOfLines = 0
-        textLabel.font = .boldTiny
-        textLabel.textColor = Appearance.CodeEditor.textColor
-        textLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            textLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            textLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            ])
-        button.isHidden = true
-        button.backgroundColor = .seaGreen
-        button.titleLabel?.font = .boldMedium
-        button.setTitleColor(.white, for: .normal)
-    }
-    
-}
 
 
 fileprivate class KeyboardButton: UIButton {
