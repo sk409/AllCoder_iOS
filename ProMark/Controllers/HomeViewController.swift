@@ -95,9 +95,31 @@ class HomeViewController: UIViewController {
                 right: 0
             )
             materialDetailsView.transitionToLessonViewController = { lesson in
-                let lessonViewController = LessonViewController()
-                lessonViewController.lesson = lesson
-                self.present(lessonViewController, animated: true)
+                guard let user = self.user else {
+                    return
+                }
+                let parameters = [
+                    URLQueryItem(name: "user_id", value: String(user.id)),
+                    URLQueryItem(name: "material_id", value: String(material.id)),
+                    URLQueryItem(name: "lesson_id", value: String(lesson.id)),
+                ]
+                HTTP().async(route: .init(resource: .lessons, name: .index), parameters: parameters)
+                { response in
+                    guard let response = response else {
+                        return
+                    }
+                    let jsonDecoder = JSONDecoder()
+                    jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+                    //print(String(data: response, encoding: .utf8))
+                    guard let lesson = (try? jsonDecoder.decode([Lesson].self, from: response))?.first else {
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        let lessonViewController = LessonViewController()
+                        lessonViewController.lesson = lesson
+                        self.present(lessonViewController, animated: true)
+                    }
+                }
             }
             self.curtainView.contentView = materialDetailsView
             //print(self.curtainView.bounds.size)
