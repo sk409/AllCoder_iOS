@@ -15,11 +15,14 @@ class LessonViewController: UIViewController {
 //        return [.landscapeLeft, .landscapeRight]
 //    }
     
+    var material: Material?
     var lesson: Lesson? {
         didSet {
             fileTreeView.rootFolder = lesson?.rootFolder
         }
     }
+    
+    private var selectedQuestionId: Int?
     
     private let sideTabBarView = TabBarView()
     private let fileTreeView = FileTreeView()
@@ -54,7 +57,7 @@ class LessonViewController: UIViewController {
         codeEditorView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             codeEditorView.leadingAnchor.constraint(equalTo: sideTabBarView.trailingAnchor),
-            codeEditorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            codeEditorView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             codeEditorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             codeEditorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
@@ -64,18 +67,111 @@ class LessonViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(observeTapFileViewNotification(_:)), name: .fileViewTapped, object: nil)
     }
     
-    private func changeCodeEditorView(fileId: Int? = nil) {
-//        let fileId = fileId ??
-//                     releasedDescriptions[
-//                        descriptionIndex ?? (releasedDescriptions.count - 1)
-//                        ].fileId
-//        codeEditorViews.forEach { $0.alpha = 0 }
-//        codeEditorViews.first { codeEditorView in
-//            guard let file = codeEditorView.file else {
-//                return false
-//            }
-//            return file.id == fileId
-//        }?.alpha = 1
+    private func insertAnswer(answerText: String, question: Question, updatingServerFiles: Bool = true) {
+        guard !answerText.isEmpty else {
+            return
+        }
+        let questionTextFields = codeEditorView.questionViews.filter {
+            $0.questionId != nil && $0.questionId! == question.id
+        }.sorted {
+            ($0.startIndex ?? 0) < ($1.startIndex ?? 0)
+        }
+        var inputText = ""
+        var nextQuestionTextField: QuestionView?
+        for questionTextField in questionTextFields {
+            inputText += questionTextField.text
+            if questionTextField.text != questionTextField.answer {
+                nextQuestionTextField = questionTextField
+                break
+            }
+        }
+        guard let nq = nextQuestionTextField,
+            let startIndex = nq.startIndex,
+            let endIndex = nq.endIndex
+        else {
+                return
+        }
+        /*********************************************/
+        // 改行は打たせない方針でOK?
+        if question.answer.hasPrefix(inputText + "\n" + answerText) {
+            inputText += "\n"
+            question.input += "\n"
+        }
+        /*********************************************/
+        if question.answer.hasPrefix(inputText + answerText)
+        {
+            nq.text.append(answerText)
+            question.input += answerText
+            let mutableAttributedText = NSMutableAttributedString(attributedString: codeEditorView.codeTextView.attributedText)
+            codeEditorView.syntaxhighlightedText.enumerateAttribute(
+                .foregroundColor,
+                in: NSRange(location: startIndex, length: endIndex - startIndex)
+            ) { foregroundColor, range, _ in
+                guard let foregroundColor = foregroundColor else {
+                    return
+                }
+                mutableAttributedText.addAttribute(
+                    .foregroundColor,
+                    value: foregroundColor,
+                    range: range
+                )
+            }
+            codeEditorView.codeTextView.attributedText = mutableAttributedText
+            if updatingServerFiles {
+                updateServerFiles(question: question)
+            }
+        }
+    }
+    
+    private func updateServerFiles(question: Question) {
+        if let file = codeEditorView.file {
+            var newText = file.text
+            var removingOffset = 0
+            let sortedQuestionViews = codeEditorView.questionViews.sorted { ($0.startIndex ?? 0) < ($1.startIndex ?? 0) }
+            for questionView in sortedQuestionViews {
+                guard let startIndex = questionView.startIndex,
+                    let endIndex = questionView.endIndex
+                else {
+                    return
+                }
+                newText.removeSubrange(
+                    newText.index(newText.startIndex, offsetBy: startIndex - removingOffset)
+                    ..<
+                    newText.index(newText.startIndex, offsetBy: endIndex - removingOffset)
+                )
+                removingOffset += (endIndex - startIndex)
+            }
+            var insertionOffset = 0
+            for questionView in sortedQuestionViews {
+                guard let startIndex = questionView.startIndex,
+                    let answer = questionView.answer
+                else {
+                    return
+                }
+                newText.insert(contentsOf: questionView.text, at: newText.index(newText.startIndex, offsetBy: startIndex - insertionOffset))
+                insertionOffset += (answer.count - questionView.text.count)
+            }
+            DispatchQueue.global().sync {
+                guard let user = Auth.shared.user,
+                    let material = self.material,
+                    let lesson = self.lesson
+                else {
+                    return
+                }
+                _ = HTTP().sync(route: .init(resource: .files, name: .store), parameters: [
+                    URLQueryItem(name: "path", value: file.path),
+                    URLQueryItem(name: "text", value: newText),
+                ])
+                _ = HTTP().sync(route: .init(resource: .questions, name: .store), parameters: [
+                    URLQueryItem(name: "user_id", value: String(user.id)),
+                    URLQueryItem(name: "material_id", value: String(material.id)),
+                    URLQueryItem(name: "lesson_id", value: String(lesson.id)),
+                    URLQueryItem(name: "question_id", value: String(question.id)),
+                    URLQueryItem(name: "input", value: question.input),
+                ])
+        //                    print(String(data: response!, encoding: .utf8))
+            }
+        }
     }
     
     @objc
@@ -84,16 +180,18 @@ class LessonViewController: UIViewController {
             return
         }
         codeEditorView.set(file: file)
-        codeEditorView.questionFrameViews.forEach { $0.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapQuestionFrameView(_:))))}
+        file.option?.questions.forEach { self.insertAnswer(answerText: $0.input, question: $0, updatingServerFiles: false) }
+        codeEditorView.questionViews.forEach { $0.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapQuestionFrameView(_:))))}
     }
     
     @objc
     private func onTapQuestionFrameView(_ sender: UITapGestureRecognizer) {
-        guard let tappedQuestionFrameView = sender.view as? QuestionFrameView else {
+        guard let tappedQuestionFrameView = sender.view as? QuestionView else {
             return
         }
+        selectedQuestionId = tappedQuestionFrameView.questionId
         var counter = [NSAttributedString: Int]()
-        for questionFrameView in codeEditorView.questionFrameViews {
+        for questionFrameView in codeEditorView.questionViews {
             if let id1 = tappedQuestionFrameView.questionId,
                 let id2 = questionFrameView.questionId,
                 id1 == id2
@@ -130,90 +228,62 @@ class LessonViewController: UIViewController {
             }
         }
         keyboardView.counter = counter
+        keyboardView.buttons.forEach { $0.addTarget(self, action: #selector(onTouchUpInsideKeyboardButton(_:)), for: .touchUpInside) }
         sideTabBarView.selectedTabIndex = 1
     }
     
     @objc
     private func onTouchUpInsideKeyboardButton(_ sender: KeyboardButton) {
-//        guard let text = sender.text else {
-//            return
-//        }
-//        guard let activeQuestion = activeQuestion else {
-//            return
-//        }
-//        guard let codeEditorView = codeEditorView else {
-//            return
-//        }
-//        let notificationLabel = UILabel()
-//        view.addSubview(notificationLabel)
-//        notificationLabel.font = .boldLarge
-//        notificationLabel.textColor = Appearance.CodeEditor.textColor
-//        notificationLabel.textAlignment = .center
-//        notificationLabel.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            notificationLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-//            notificationLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-//            ])
-//        let animateNotificationLabel = {
-//            let magnification: CGFloat = 1.25
-//            let notificationLabelFitSize = notificationLabel.fitSize
-//            NSLayoutConstraint.activate([
-//                notificationLabel.widthAnchor.constraint(equalToConstant: notificationLabelFitSize.width * magnification),
-//                notificationLabel.heightAnchor.constraint(equalToConstant: notificationLabelFitSize.height * magnification),
-//                ])
-//            notificationLabel.alpha = 0
-//            UIView.Animation.normal(animations: {
-//                notificationLabel.alpha = 1
-//            }) { _ in
-//                UIView.Animation.normal(animations: {
-//                    notificationLabel.alpha = 0
-//                }) { _ in
-//                    notificationLabel.removeFromSuperview()
-//                }
-//            }
-//        }
-//        guard codeEditorView.isCorrect(text: text) else {
-//            notificationLabel.text = "✖︎"
-//            notificationLabel.backgroundColor = .signalRed
-//            animateNotificationLabel()
-//            return
-//        }
-//        notificationLabel.text = "◯"
-//        notificationLabel.backgroundColor = .seaGreen
-//        animateNotificationLabel()
-//        guard codeEditorView.solve(questionId: activeQuestion.id, text: text) else {
-//            if let nextAnswer = codeEditorView.answers.first {
-//                codeEditorView.scroll(to: nextAnswer.range.location)
-//            }
-//            return
-//        }
-//        nextPhase()
+        guard let selectedQuestionId = selectedQuestionId,
+            let question = codeEditorView.file?.option?.questions.first(where: {$0.id == selectedQuestionId}),
+            let buttonText = sender.text
+        else {
+            return
+        }
+        insertAnswer(answerText: buttonText, question: question)
     }
     
 }
 
-fileprivate class QuestionFrameView: UIView {
+fileprivate class QuestionView: UIView {
     
     var questionId: Int?
     var startIndex: Int?
     var endIndex: Int?
+    var answer: String?
+    
+    var text = ""
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupViews()
+    }
+    
+    private func setupViews() {
+        
+    }
     
 }
 
 fileprivate class CodeEditorView: UIScrollView {
     
-    struct Answer {
-        let questionId: Int
-        let inputButtonId: Int
-        let attributedText: NSAttributedString
-        let range: NSRange
-        init(questionId: Int, inputButtonId: Int, attributedText: NSAttributedString, range: NSRange) {
-            self.questionId = questionId
-            self.inputButtonId = inputButtonId
-            self.attributedText = attributedText
-            self.range = range
-        }
-    }
+//    struct Answer {
+//        let questionId: Int
+//        let inputButtonId: Int
+//        let attributedText: NSAttributedString
+//        let range: NSRange
+//        init(questionId: Int, inputButtonId: Int, attributedText: NSAttributedString, range: NSRange) {
+//            self.questionId = questionId
+//            self.inputButtonId = inputButtonId
+//            self.attributedText = attributedText
+//            self.range = range
+//        }
+//    }
     
     var insets = UIEdgeInsets(
         top: UIFont.tiny.pointSize * 0.3,
@@ -243,12 +313,13 @@ fileprivate class CodeEditorView: UIScrollView {
         ]
     }
     
+    let codeTextView = UITextView()
+    
     private(set) var file: File?
-    private(set) var answers = [Answer]()
-    private(set) var questionFrameViews = [QuestionFrameView]()
+    //private(set) var answers = [Answer]()
+    private(set) var questionViews = [QuestionView]()
     private(set) var syntaxhighlightedText = NSMutableAttributedString(string: "")
     
-    private let codeTextView = UITextView()
     private let caretView = CaretView()
     
     override init(frame: CGRect) {
@@ -271,12 +342,12 @@ fileprivate class CodeEditorView: UIScrollView {
 //        }
         let syntaxhighlightedText = NSMutableAttributedString(string: file.text, attributes: textAttributes)
         self.syntaxhighlightedText = NSMutableAttributedString(attributedString: syntaxhighlightedText)
-        answers.removeAll(keepingCapacity: true)
-        questionFrameViews.forEach { $0.removeFromSuperview() }
-        questionFrameViews.removeAll(keepingCapacity: true)
+        //answers.removeAll(keepingCapacity: true)
+        questionViews.forEach { $0.removeFromSuperview() }
+        questionViews.removeAll(keepingCapacity: true)
         if let questions = file.option?.questions {
             for question in questions {
-                questionFrameViews.append(contentsOf: addQuestionFrameViews(
+                questionViews.append(contentsOf: addQuestions(
                     id: question.id,
                     startIndex: question.startIndex,
                     endIndex: question.endIndex
@@ -318,21 +389,26 @@ fileprivate class CodeEditorView: UIScrollView {
         }
     }
     
-    func addQuestionFrameViews(
+    func addQuestions(
         id: Int,
         startIndex: Int,
         endIndex: Int,
         color: UIColor = Appearance.CodeEditor.textColor
-    ) -> [QuestionFrameView]
+    ) -> [QuestionView]
     {
         guard let file = file else {
             return []
         }
-        var questionFrameViews = [QuestionFrameView]()
+        var questionFrameViews = [QuestionView]()
         var s = startIndex
         var e = startIndex
         let addQuestionFrameView = {
-            guard let questionFrameView = self.addQuestionFrameView(id: id, startIndex: s, endIndex: e) else {
+            guard let questionFrameView = self.addQuestion(
+                id: id,
+                startIndex: s,
+                endIndex: e,
+                answer: file.text[s..<e]
+            ) else {
                 return
             }
             questionFrameViews.append(questionFrameView)
@@ -350,12 +426,13 @@ fileprivate class CodeEditorView: UIScrollView {
         return questionFrameViews
     }
     
-    func addQuestionFrameView(
+    func addQuestion(
         id: Int,
         startIndex: Int,
         endIndex: Int,
+        answer: String,
         color: UIColor = Appearance.CodeEditor.textColor
-    ) -> QuestionFrameView?
+    ) -> QuestionView?
     {
         guard let file = file else {
             return nil
@@ -368,11 +445,12 @@ fileprivate class CodeEditorView: UIScrollView {
             (textSize(String(head!)).width - textSize(String(file.text[startIndex])).width) :
             CGFloat(0)) + insets.left
         let y = textSize(upTo: startIndex, omittingLastLine: true).height + insets.top
-        let questionFrameView = QuestionFrameView()
+        let questionFrameView = QuestionView()
         addSubview(questionFrameView)
         questionFrameView.questionId = id
         questionFrameView.startIndex = startIndex
         questionFrameView.endIndex = endIndex
+        questionFrameView.answer = answer
         questionFrameView.layer.borderWidth = borderSize
         questionFrameView.layer.borderColor = color.cgColor
         questionFrameView.frame = CGRect(x: x, y: y, width: lineSize.width, height: lineSize.height)
@@ -387,64 +465,64 @@ fileprivate class CodeEditorView: UIScrollView {
         return textSize(file?.text[startIndex..<endIndex], omittingLastLine: omittingLastLine)
     }
     
-    func isCorrect(text: String) -> Bool {
-        guard let nextAnswer = answers.first else {
-            return false
-        }
-        return nextAnswer.attributedText.string == text
-    }
-    
-    func solve(questionId: Int, text: String) -> Bool {
-        guard isCorrect(text: text) else {
-            return false
-        }
-        guard let attributedText = codeTextView.attributedText else {
-            return false
-        }
-        guard let nextAnswer = answers.first else {
-            return false
-        }
-        let mutableAttributedText = NSMutableAttributedString(
-            attributedString: attributedText
-        )
-        nextAnswer.attributedText.enumerateAttribute(
-            .foregroundColor,
-            in: nextAnswer.attributedText.string.fullRange
-        ) { foregroundColor, range, _ in
-            guard let foregroundColor = foregroundColor else {
-                return
-            }
-            mutableAttributedText.addAttribute(
-                .foregroundColor,
-                value: foregroundColor,
-                range: NSRange(
-                    location: nextAnswer.range.location + range.location,
-                    length: range.length
-                )
-            )
-        }
-        codeTextView.attributedText = mutableAttributedText
-        _ = answers.removeFirst()
-        moveCaret()
-        return answers.first { $0.questionId == questionId } == nil
-    }
-    
-    func activateQuestion(id: Int) {
-//        questionFrames.filter { $0.questionId == id}.forEach { $0.borderViews.forEach { $0.backgroundColor = Appearance.CodeEditor.activeColor }}
-    }
-
-    func deactivateQuestion(id: Int) {
-//        questionFrames.filter { $0.questionId == id}.forEach { $0.borderViews.forEach { $0.backgroundColor = Appearance.CodeEditor.inactiveColor }}
-    }
-    
-    func showCaret() {
-        moveCaret()
-        caretView.show()
-    }
-    
-    func hideCaret() {
-        caretView.hide()
-    }
+//    func isCorrect(text: String) -> Bool {
+//        guard let nextAnswer = answers.first else {
+//            return false
+//        }
+//        return nextAnswer.attributedText.string == text
+//    }
+//
+//    func solve(questionId: Int, text: String) -> Bool {
+//        guard isCorrect(text: text) else {
+//            return false
+//        }
+//        guard let attributedText = codeTextView.attributedText else {
+//            return false
+//        }
+//        guard let nextAnswer = answers.first else {
+//            return false
+//        }
+//        let mutableAttributedText = NSMutableAttributedString(
+//            attributedString: attributedText
+//        )
+//        nextAnswer.attributedText.enumerateAttribute(
+//            .foregroundColor,
+//            in: nextAnswer.attributedText.string.fullRange
+//        ) { foregroundColor, range, _ in
+//            guard let foregroundColor = foregroundColor else {
+//                return
+//            }
+//            mutableAttributedText.addAttribute(
+//                .foregroundColor,
+//                value: foregroundColor,
+//                range: NSRange(
+//                    location: nextAnswer.range.location + range.location,
+//                    length: range.length
+//                )
+//            )
+//        }
+//        codeTextView.attributedText = mutableAttributedText
+//        _ = answers.removeFirst()
+//        moveCaret()
+//        return answers.first { $0.questionId == questionId } == nil
+//    }
+//
+//    func activateQuestion(id: Int) {
+////        questionFrames.filter { $0.questionId == id}.forEach { $0.borderViews.forEach { $0.backgroundColor = Appearance.CodeEditor.activeColor }}
+//    }
+//
+//    func deactivateQuestion(id: Int) {
+////        questionFrames.filter { $0.questionId == id}.forEach { $0.borderViews.forEach { $0.backgroundColor = Appearance.CodeEditor.inactiveColor }}
+//    }
+//
+//    func showCaret() {
+//        moveCaret()
+//        caretView.show()
+//    }
+//
+//    func hideCaret() {
+//        caretView.hide()
+//    }
     
     private func setupViews() {
         addSubview(codeTextView)
@@ -461,22 +539,22 @@ fileprivate class CodeEditorView: UIScrollView {
         caretView.frame.size.height = textSize(" ").height
     }
     
-    private func moveCaret() {
-        guard let file = file else {
-            return
-        }
-        guard let nextAnswer = answers.first else {
-            return
-        }
-        let line = file.text[...nextAnswer.range.location].split(separator: "\n").last
-        let x = (line != nil) ?
-            textSize(String(line!)).width - textSize(String(file.text[nextAnswer.range.location])).width :
-            CGFloat(0)
-        let y = textSize(upTo: nextAnswer.range.location, omittingLastLine: true).height
-        caretView.frame.origin.x = insets.left + x
-        caretView.frame.origin.y = insets.top + y
-        bringSubviewToFront(caretView)
-    }
+//    private func moveCaret() {
+//        guard let file = file else {
+//            return
+//        }
+//        guard let nextAnswer = answers.first else {
+//            return
+//        }
+//        let line = file.text[...nextAnswer.range.location].split(separator: "\n").last
+//        let x = (line != nil) ?
+//            textSize(String(line!)).width - textSize(String(file.text[nextAnswer.range.location])).width :
+//            CGFloat(0)
+//        let y = textSize(upTo: nextAnswer.range.location, omittingLastLine: true).height
+//        caretView.frame.origin.x = insets.left + x
+//        caretView.frame.origin.y = insets.top + y
+//        bringSubviewToFront(caretView)
+//    }
     
     private func textSize(_ text: String?, omittingLastLine: Bool = false) -> CGSize {
         guard let text = text else {
@@ -583,6 +661,7 @@ fileprivate class KeyboardView: UIScrollView {
                     )
                 }
             }
+            layoutButtons()
         }
     }
     
@@ -622,14 +701,14 @@ fileprivate class KeyboardView: UIScrollView {
             pointer.x += (button.bounds.width + margin)
             maxLineHeight = max(maxLineHeight, button.bounds.height)
         }
-        for row in rows {
-            let padding = (
-                contentSize.width - insets.left - insets.right -
-                row.reduce(0, { $0 + $1.bounds.width }) -
-                (margin * CGFloat(row.count - 1))
-                ) / 2
-            row.forEach { $0.frame.origin.x += padding }
-        }
+//        for row in rows {
+//            let padding = (
+//                contentSize.width - insets.left - insets.right -
+//                row.reduce(0, { $0 + $1.bounds.width }) -
+//                (margin * CGFloat(row.count - 1))
+//                ) / 2
+//            row.forEach { $0.frame.origin.x += padding }
+//        }
         contentSize.height = (pointer.y + maxLineHeight)
     }
     

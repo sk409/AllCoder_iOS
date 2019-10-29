@@ -39,7 +39,6 @@ class HomeViewController: UIViewController {
             let jsonDecoder = JSONDecoder()
             jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
             self.user = (try? jsonDecoder.decode([User].self, from: response))?.first
-            //print(self.user)
             self.purchasedMaterialsTableView.materials = self.user?.purchasedMaterials
             self.purchasedMaterialsTableView.lessonCompletions = self.user?.lessonCompletions
             DispatchQueue.main.async {
@@ -110,21 +109,18 @@ class HomeViewController: UIViewController {
                     }
                     let jsonDecoder = JSONDecoder()
                     jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-                    //print(String(data: response, encoding: .utf8))
                     guard let lesson = (try? jsonDecoder.decode([Lesson].self, from: response))?.first else {
                         return
                     }
                     DispatchQueue.main.async {
                         let lessonViewController = LessonViewController()
+                        lessonViewController.material = material
                         lessonViewController.lesson = lesson
                         self.present(lessonViewController, animated: true)
                     }
                 }
             }
             self.curtainView.contentView = materialDetailsView
-            //print(self.curtainView.bounds.size)
-            //self.curtainView.frame.size = self.maskView.frame.size
-            //print(self.curtainView.bounds.size)
             self.curtainView.slideIn()
         }
         profileView.onTapProfileImageView = {

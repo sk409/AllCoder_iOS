@@ -24,6 +24,8 @@ struct HTTP {
             case materials
             case lessons
             case users
+            case files
+            case questions
         }
         
         enum Name: String {
@@ -68,10 +70,14 @@ struct HTTP {
             case .update:
                 if let id = id {
                     path += resource.rawValue + "/" + String(id)
+                } else {
+                    path += resource.rawValue
                 }
             case .edit:
                 if let id = id {
                     path += resource.rawValue + "/" + String(id) + "/" + name.rawValue
+                } else {
+                    path += resource.rawValue + "/" + name.rawValue
                 }
             }
             self.path = path
@@ -126,16 +132,19 @@ struct HTTP {
         }
         urlComponents.queryItems = parameters
         var request: URLRequest?
-        switch method {
-        case .post:
-            if let url = URL(string: origin.appendingPathComponent(path).absoluteString) {
+        let setupRequest: (String) -> Void = { method in
+            if let url = URL(string: self.origin.appendingPathComponent(path).absoluteString) {
                 request = URLRequest(url: url)
                 request?.httpBody = urlComponents.query?.data(using: .utf8)
-                request?.httpMethod = "POST"
+                request?.httpMethod = method
             }
-        case .get:
-            fallthrough
+        }
+        switch method {
+        case .post:
+            setupRequest("POST")
         case .put:
+            setupRequest("PUT")
+        case .get:
             fallthrough
         case .delete:
             if let url = urlComponents.url {
@@ -146,11 +155,12 @@ struct HTTP {
             completion?(nil)
             return
         }
-//        print(r.url)
+        print(r.url)
 //        print(parameters)
         URLSession.shared.dataTask(with: r) { data, response, error in
             completion?(data)
             }.resume()
+        
     }
     
     func async(route: Route, parameters: [URLQueryItem] = [], completion: ((Data?) -> Void)? = nil) {
