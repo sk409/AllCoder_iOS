@@ -1,2 +1,4 @@
 ${PODS_ROOT}/Target Support Files/Pods-ProMark/Pods-ProMark-frameworks.sh
+${BUILT_PRODUCTS_DIR}/KRActivityIndicatorView/KRActivityIndicatorView.framework
+${BUILT_PRODUCTS_DIR}/KRProgressHUD/KRProgressHUD.framework
 ${BUILT_PRODUCTS_DIR}/MarkdownView/MarkdownView.framework

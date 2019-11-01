@@ -18,6 +18,8 @@ struct HTTP {
         enum API: String {
             case register
             case login
+            case previewUp
+            case previewDown
         }
         
         enum Resource: String {
@@ -49,6 +51,12 @@ struct HTTP {
                 method = .post
             case .login:
                 path += api.rawValue
+                method = .post
+            case .previewUp:
+                path += "preview/up"
+                method = .post
+            case .previewDown:
+                path += "preview/down"
                 method = .post
             }
             self.path = path
@@ -155,7 +163,7 @@ struct HTTP {
             completion?(nil)
             return
         }
-        print(r.url)
+//        print(r.url)
 //        print(parameters)
         URLSession.shared.dataTask(with: r) { data, response, error in
             completion?(data)

@@ -1,16 +1,24 @@
 PODS:
+  - KRActivityIndicatorView (3.0.4)
+  - KRProgressHUD (3.4.4):
+    - KRActivityIndicatorView (= 3.0.4)
   - MarkdownView (1.6.0)
 
 DEPENDENCIES:
+  - KRProgressHUD
   - MarkdownView
 
 SPEC REPOS:
   trunk:
+    - KRActivityIndicatorView
+    - KRProgressHUD
     - MarkdownView
 
 SPEC CHECKSUMS:
+  KRActivityIndicatorView: 549db10b9578d58bac73db063d8b544e8970f7f2
+  KRProgressHUD: c3b9a48a0ee4824ea13212ac3f1efa50dca021e3
   MarkdownView: 25c1c2d7ff9706624a575556296e188be3dd3f6b
 
-PODFILE CHECKSUM: e45454c535645223cc3f951474bc39fbf5a1e95c
+PODFILE CHECKSUM: bac83251bf0e6c39003e8614da0333707b84de9d
 
 COCOAPODS: 1.8.4

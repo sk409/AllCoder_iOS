@@ -1,5 +1,8 @@
-import UIKit
+import KRProgressHUD
 import MarkdownView
+import UIKit
+import WebKit
+
 
 class LessonViewController: UIViewController {
     
@@ -7,38 +10,51 @@ class LessonViewController: UIViewController {
         return true
     }
     
-//    override var shouldAutorotate: Bool {
-//        return true
-//    }
+    override var shouldAutorotate: Bool {
+        return true
+    }
     
-//    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-//        return [.landscapeLeft, .landscapeRight]
-//    }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return [.landscapeLeft, .landscapeRight]
+    }
     
     var material: Material?
     var lesson: Lesson? {
         didSet {
             fileTreeView.rootFolder = lesson?.rootFolder
+            markdownView.load(markdown: lesson?.book)
         }
     }
     
     private var selectedQuestionId: Int?
+    private var previewWebViewTopConstraint: NSLayoutConstraint?
+    private var previewWebViewBottomConstraint: NSLayoutConstraint?
+    private var markdownViewTopConstraint: NSLayoutConstraint?
+    private var markdownViewBottomConstraint: NSLayoutConstraint?
     
     private let sideTabBarView = TabBarView()
     private let fileTreeView = FileTreeView()
     private let keyboardView = KeyboardView()
     private let codeEditorView = CodeEditorView()
+    private let moreButton = UIButton()
+    private let previewWebView = WKWebView()
+    private let markdownView = MarkdownView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         addObservers()
+        upPreviewContainer()
     }
     
     private func setupViews() {
         view.backgroundColor = .black
         view.addSubview(sideTabBarView)
         view.addSubview(codeEditorView)
+        view.addSubview(moreButton)
+        view.addSubview(previewWebView)
+        view.addSubview(markdownView)
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTapView(_:))))
         let sideViewBackgroundColor = UIColor(red: 51/255, green: 58/255, blue: 73/255, alpha: 1)
         fileTreeView.backgroundColor = sideViewBackgroundColor
         keyboardView.backgroundColor = sideViewBackgroundColor
@@ -61,10 +77,75 @@ class LessonViewController: UIViewController {
             codeEditorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             codeEditorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
+        moreButton.setBackgroundImage(UIImage(named: "more-button"), for: .normal)
+        moreButton.addTarget(self, action: #selector(onTouchUpInsideMoreButton(_:)), for: .touchUpInside)
+        moreButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            moreButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            moreButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            moreButton.widthAnchor.constraint(equalToConstant: max(44, UIFont.tiny.pointSize)),
+            moreButton.heightAnchor.constraint(equalTo: moreButton.widthAnchor),
+        ])
+        previewWebView.translatesAutoresizingMaskIntoConstraints = false
+        previewWebViewTopConstraint = previewWebView.topAnchor.constraint(equalTo: view.bottomAnchor)
+        previewWebViewBottomConstraint = previewWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        NSLayoutConstraint.activate([
+            previewWebView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            previewWebView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            previewWebViewTopConstraint!,
+            previewWebView.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, constant: -max(44, UIFont.tiny.pointSize * 2)),
+        ])
+        markdownView.translatesAutoresizingMaskIntoConstraints = false
+        markdownViewTopConstraint = markdownView.topAnchor.constraint(equalTo: view.bottomAnchor)
+        markdownViewBottomConstraint = markdownView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        NSLayoutConstraint.activate([
+            markdownView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            markdownView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            markdownViewTopConstraint!,
+            markdownView.heightAnchor.constraint(equalTo: previewWebView.heightAnchor),
+        ])
     }
     
     private func addObservers() {
         NotificationCenter.default.addObserver(self, selector: #selector(observeTapFileViewNotification(_:)), name: .fileViewTapped, object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(downPreviewContainer(_:)),
+            name: UIApplication.willTerminateNotification,
+            object: nil
+        )
+    }
+    
+    private func upPreviewContainer() {
+        guard let user = Auth.shared.user,
+            let material = material,
+            let lesson = lesson
+        else {
+            return
+        }
+        let parameters = [
+            URLQueryItem(name: "user_id", value: String(user.id)),
+            URLQueryItem(name: "material_id", value: String(material.id)),
+            URLQueryItem(name: "lesson_id", value: String(lesson.id)),
+        ]
+        HTTP().async(route: .init(api: .previewUp), parameters: parameters)
+    }
+    
+    // TODO: 呼ばれない
+    @objc
+    private func downPreviewContainer(_ notification: Notification) {
+        guard let user = Auth.shared.user,
+            let material = material,
+            let lesson = lesson
+        else {
+            return
+        }
+        let parameters = [
+            URLQueryItem(name: "user_id", value: String(user.id)),
+            URLQueryItem(name: "material_id", value: String(material.id)),
+            URLQueryItem(name: "lesson_id", value: String(lesson.id)),
+        ]
+        HTTP().async(route: .init(api: .previewDown), parameters: parameters)
     }
     
     private func insertAnswer(answerText: String, question: Question, updatingServerFiles: Bool = true) {
@@ -92,7 +173,7 @@ class LessonViewController: UIViewController {
                 return
         }
         /*********************************************/
-        // 改行は打たせない方針でOK?
+        // TODO: 改行は打たせない方針でOK?
         if question.answer.hasPrefix(inputText + "\n" + answerText) {
             inputText += "\n"
             question.input += "\n"
@@ -169,7 +250,8 @@ class LessonViewController: UIViewController {
                     URLQueryItem(name: "question_id", value: String(question.id)),
                     URLQueryItem(name: "input", value: question.input),
                 ])
-        //                    print(String(data: response!, encoding: .utf8))
+//                print(String(data: response!, encoding: .utf8))
+//                print(String(data: response2!, encoding: .utf8))
             }
         }
     }
@@ -241,6 +323,112 @@ class LessonViewController: UIViewController {
             return
         }
         insertAnswer(answerText: buttonText, question: question)
+    }
+    
+    @objc
+    private func onTouchUpInsideMoreButton(_ sender: UIButton) {
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alertController.addAction(UIAlertAction(title: "問題一覧", style: .default) { _ in
+            
+        })
+        alertController.addAction(UIAlertAction(title: "説明文", style: .default) { _ in
+            guard let markdownViewTopConstraint = self.markdownViewTopConstraint,
+                markdownViewTopConstraint.isActive
+                else {
+                    return
+            }
+            self.moreButton.isEnabled = false
+            markdownViewTopConstraint.isActive = false
+            self.markdownViewBottomConstraint?.isActive = true
+            UIView.Animation.fast {
+                self.view.layoutIfNeeded()
+            }
+            _ = self.addBlackout()
+            self.view.bringSubviewToFront(self.markdownView)
+        })
+        alertController.addAction(UIAlertAction(title: "プレビュー", style: .default) { _ in
+            let preview: (Bool) -> Void = { restart in
+                guard let user = Auth.shared.user,
+                    let material = self.material,
+                    let lesson = self.lesson
+                else {
+                    return
+                }
+                var urlComponents = URLComponents(string: HTTP.defaultOrigin.appendingPathComponent("api").appendingPathComponent("preview").absoluteString)
+                let prameters = [
+                    URLQueryItem(name: "user_id", value: String(user.id)),
+                    URLQueryItem(name: "material_id", value: String(material.id)),
+                    URLQueryItem(name: "lesson_id", value: String(lesson.id)),
+                ]
+                if restart {
+                    HTTP().async(route: .init(api: .previewUp), parameters: prameters)
+                }
+                urlComponents?.queryItems = prameters
+                guard let url = urlComponents?.url else {
+                    return
+                }
+                self.moreButton.isEnabled = false
+                let request = URLRequest(url: url)
+                self.previewWebView.load(request)
+                KRProgressHUD.show(withMessage: "Loading...")
+                Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+                    guard !self.previewWebView.isLoading else {
+                        return
+                    }
+                    timer.invalidate()
+                    KRProgressHUD.dismiss()
+                    guard let previewWebViewTopConstraint = self.previewWebViewTopConstraint,
+                        let previewWebViewBottomConstraint = self.previewWebViewBottomConstraint
+                    else {
+                        return
+                    }
+                    previewWebViewTopConstraint.isActive = !previewWebViewTopConstraint.isActive
+                    previewWebViewBottomConstraint.isActive = !previewWebViewBottomConstraint.isActive
+                    UIView.Animation.fast {
+                        self.view.layoutIfNeeded()
+                    }
+                }
+                _ = self.addBlackout()
+                self.view.bringSubviewToFront(self.previewWebView)
+            }
+            let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            alertController.addAction(UIAlertAction(title: "再起動", style: .default) { _ in
+                preview(true)
+            })
+            alertController.addAction(UIAlertAction(title: "実行", style: .default) { _ in
+                preview(false)
+            })
+            alertController.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
+            self.present(alertController, animated: true)
+        })
+        alertController.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
+        present(alertController, animated: true)
+    }
+    
+    @objc
+    private func onTapView(_ sender: UITapGestureRecognizer) {
+        if let previewWebViewBottomConstraint = previewWebViewBottomConstraint,
+            previewWebViewBottomConstraint.isActive
+        {
+            removeBlackout()
+            moreButton.isEnabled = true
+            previewWebViewTopConstraint?.isActive = true
+            previewWebViewBottomConstraint.isActive = false
+            UIView.Animation.fast {
+                self.view.layoutIfNeeded()
+            }
+        }
+        if let markdownViewBottomConstraint = markdownViewBottomConstraint,
+            markdownViewBottomConstraint.isActive
+        {
+            removeBlackout()
+            moreButton.isEnabled = true
+            markdownViewTopConstraint?.isActive = true
+            markdownViewBottomConstraint.isActive = false
+            UIView.Animation.fast {
+                self.view.layoutIfNeeded()
+            }
+        }
     }
     
 }

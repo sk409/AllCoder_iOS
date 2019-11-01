@@ -1,3 +1,4 @@
+import KRProgressHUD
 import Photos
 import UIKit
 
@@ -102,6 +103,7 @@ class HomeViewController: UIViewController {
                     URLQueryItem(name: "material_id", value: String(material.id)),
                     URLQueryItem(name: "lesson_id", value: String(lesson.id)),
                 ]
+                KRProgressHUD.show(withMessage: "Loading...")
                 HTTP().async(route: .init(resource: .lessons, name: .index), parameters: parameters)
                 { response in
                     guard let response = response else {
@@ -116,6 +118,7 @@ class HomeViewController: UIViewController {
                         let lessonViewController = LessonViewController()
                         lessonViewController.material = material
                         lessonViewController.lesson = lesson
+                        KRProgressHUD.dismiss()
                         self.present(lessonViewController, animated: true)
                     }
                 }

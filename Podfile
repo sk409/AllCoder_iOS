@@ -8,6 +8,7 @@ target 'ProMark' do
   # Pods for ProMark
 
   pod "MarkdownView"
+  pod "KRProgressHUD"
 
   target 'ProMarkTests' do
     inherit! :search_paths
