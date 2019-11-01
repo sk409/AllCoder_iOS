@@ -401,6 +401,9 @@ class LessonViewController: UIViewController {
             alertController.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
             self.present(alertController, animated: true)
         })
+        alertController.addAction(UIAlertAction(title: "終了", style: .destructive) { _ in
+            self.dismiss(animated: true)
+        })
         alertController.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
         present(alertController, animated: true)
     }
