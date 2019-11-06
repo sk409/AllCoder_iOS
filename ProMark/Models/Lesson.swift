@@ -9,7 +9,7 @@ class Lesson: Decodable {
     let book: String
     let createdAt: String
     let updatedAt: String
-    let evaluations: [Int]
+    let ratings: [Int]
     let rootFolder: Folder?
     let comments: [LessonComment]
     

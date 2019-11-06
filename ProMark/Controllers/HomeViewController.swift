@@ -41,7 +41,7 @@ class HomeViewController: UIViewController {
             jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
             self.user = (try? jsonDecoder.decode([User].self, from: response))?.first
             self.purchasedMaterialsTableView.materials = self.user?.purchasedMaterials
-            self.purchasedMaterialsTableView.lessonCompletions = self.user?.lessonCompletions
+            //self.purchasedMaterialsTableView.lessonCompletions = self.user?.lessonCompletions
             DispatchQueue.main.async {
                 self.purchasedMaterialsTableView.reloadData()
                 self.profileView.profileImageView.fetch(path: self.user?.profileImagePath)
@@ -87,7 +87,7 @@ class HomeViewController: UIViewController {
         purchasedMaterialsTableView.onSelectCell = { material in
             let materialDetailsView = MaterialDetailsView()
             materialDetailsView.material = material
-            materialDetailsView.lessonCompletions = self.user?.lessonCompletions
+            //materialDetailsView.lessonCompletions = self.user?.lessonCompletions
             materialDetailsView.scrollView.contentInset = UIEdgeInsets(
                 top: 0,
                 left: 0,
@@ -453,7 +453,7 @@ fileprivate class PurchasedMaterialTableViewCell: UITableViewCell {
 fileprivate class PurchasedMaterialsTableView: UITableView, UITableViewDataSource, UITableViewDelegate {
     
     var materials: [Material]?
-    var lessonCompletions: [LessonCompletion]?
+//    var lessonCompletions: [LessonCompletion]?
     var onSelectCell: ((Material) -> Void)?
     
     override init(frame: CGRect, style: UITableView.Style) {
@@ -477,12 +477,12 @@ fileprivate class PurchasedMaterialsTableView: UITableView, UITableViewDataSourc
         guard let materials = materials else {
             return UITableViewCell()
         }
-        guard let lessonCompletions = lessonCompletions else {
-            return UITableViewCell()
-        }
+//        guard let lessonCompletions = lessonCompletions else {
+//            return UITableViewCell()
+//        }
         let material = materials[indexPath.row]
-        let lessonCount = material.lessons.count
-        let lessonCompletionCount = lessonCompletions.filter { $0.materialId == material.id }.count
+        //let lessonCount = material.lessons.count
+        //let lessonCompletionCount = lessonCompletions.filter { $0.materialId == material.id }.count
 //        let selectedView = UIView()
 //        selectedView.backgroundColor = .clear
 //        cell.selectedBackgroundView = selectedView
@@ -491,7 +491,7 @@ fileprivate class PurchasedMaterialsTableView: UITableView, UITableViewDataSourc
 //        cell.detailsButton.addTarget(self, action: #selector(onTouchUpInsideDetailsButton(_:)), for: .touchUpInside)
 //        cell.startButton.indexPath = indexPath
 //        cell.startButton.addTarget(self, action: #selector(onTouchUpInsideStartButton(_:)), for: .touchUpInside)
-        cell.setProgress(lessonCompletionCount: lessonCompletionCount, lessonCount: lessonCount)
+        //cell.setProgress(lessonCompletionCount: lessonCompletionCount, lessonCount: lessonCount)
         return cell
     }
     

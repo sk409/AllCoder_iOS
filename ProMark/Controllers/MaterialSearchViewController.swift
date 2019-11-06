@@ -1,3 +1,4 @@
+import KRProgressHUD
 import UIKit
 
 class MaterialSearchViewController: UIViewController {
@@ -123,7 +124,9 @@ class MaterialSearchViewController: UIViewController {
             URLQueryItem(name: "user_id", value: String(user.id)),
             URLQueryItem(name: "material_id", value: String(material.id))
         ]
+        KRProgressHUD.show(withMessage: "Downloading...")
         HTTP().async(path: "api/materials/purchase", method: .post, parameters: parameters) { response in
+            KRProgressHUD.dismiss()
             DispatchQueue.main.async {
                 self.tabBarController?.selectedIndex = 0
             }

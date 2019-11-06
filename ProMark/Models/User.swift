@@ -8,7 +8,7 @@ class User: Decodable {
     let email: String
     let purchasedMaterials: [Material]
     let createdMaterials: [Material]
-    let lessonCompletions: [LessonCompletion]
+    //let lessonCompletions: [LessonCompletion]
     let createdAt: String
     let updatedAt: String
     
