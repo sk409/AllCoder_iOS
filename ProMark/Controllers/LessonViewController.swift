@@ -58,7 +58,7 @@ class LessonViewController: UIViewController {
         let sideViewBackgroundColor = UIColor(red: 51/255, green: 58/255, blue: 73/255, alpha: 1)
         fileTreeView.backgroundColor = sideViewBackgroundColor
         keyboardView.backgroundColor = sideViewBackgroundColor
-        sideTabBarView.set(contentViews: ["ファイルツリー": fileTreeView, "入力ボタン": keyboardView])
+        sideTabBarView.set(contentViews: ["ファイル": fileTreeView, "ボタン": keyboardView])
         sideTabBarView.tabBarView.backgroundColor = UIColor(red: 47/255, green: 53/255, blue: 69/255, alpha: 1)
         sideTabBarView.tabUnderLineView.backgroundColor = .white
         sideTabBarView.contentCollectionView.isScrollEnabled = false
@@ -463,19 +463,6 @@ fileprivate class QuestionView: UIView {
 
 fileprivate class CodeEditorView: UIScrollView {
     
-//    struct Answer {
-//        let questionId: Int
-//        let inputButtonId: Int
-//        let attributedText: NSAttributedString
-//        let range: NSRange
-//        init(questionId: Int, inputButtonId: Int, attributedText: NSAttributedString, range: NSRange) {
-//            self.questionId = questionId
-//            self.inputButtonId = inputButtonId
-//            self.attributedText = attributedText
-//            self.range = range
-//        }
-//    }
-    
     var insets = UIEdgeInsets(
         top: UIFont.tiny.pointSize * 0.3,
         left: UIFont.tiny.pointSize * 0.5,
@@ -497,7 +484,6 @@ fileprivate class CodeEditorView: UIScrollView {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = lineSpacing
         return [
-            .foregroundColor: UIColor.white,
             .font: font,
             .kern: letterSpacing,
             .paragraphStyle: paragraphStyle,
@@ -507,7 +493,6 @@ fileprivate class CodeEditorView: UIScrollView {
     let codeTextView = UITextView()
     
     private(set) var file: File?
-    //private(set) var answers = [Answer]()
     private(set) var questionViews = [QuestionView]()
     private(set) var syntaxhighlightedText = NSMutableAttributedString(string: "")
     
@@ -528,12 +513,9 @@ fileprivate class CodeEditorView: UIScrollView {
         guard let file = file else {
             return
         }
-//        guard let syntaxHighlightedText = SyntaxHighlighter.highlight(file: file) else {
-//            return
-//        }
-        let syntaxhighlightedText = NSMutableAttributedString(string: file.text, attributes: textAttributes)
+        let syntaxhighlightedText = SyntaxHighlighter.highlight(file: file) ?? NSMutableAttributedString(string: file.text)
+        syntaxhighlightedText.addAttributes(textAttributes, range: syntaxhighlightedText.string.fullRange)
         self.syntaxhighlightedText = NSMutableAttributedString(attributedString: syntaxhighlightedText)
-        //answers.removeAll(keepingCapacity: true)
         questionViews.forEach { $0.removeFromSuperview() }
         questionViews.removeAll(keepingCapacity: true)
         if let questions = file.option?.questions {

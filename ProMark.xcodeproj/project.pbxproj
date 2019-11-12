@@ -12,6 +12,9 @@
 		D70EB6922328A0FC0022D9C1 /* FileTreeItemHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6912328A0FC0022D9C1 /* FileTreeItemHolder.swift */; };
 		D70EB6942328A2D20022D9C1 /* FileTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6932328A2D20022D9C1 /* FileTreeView.swift */; };
 		D70EB6962328B5C60022D9C1 /* String+subscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = D70EB6952328B5C60022D9C1 /* String+subscript.swift */; };
+		D716BC71237A5A970095DC5E /* LaravelBladeSyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D716BC70237A5A970095DC5E /* LaravelBladeSyntaxHighlighter.swift */; };
+		D716BC73237A5C580095DC5E /* PHPSyntaxHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D716BC72237A5C580095DC5E /* PHPSyntaxHighlighter.swift */; };
+		D716BC75237A780D0095DC5E /* CSSSyntaxHighlighters.swift in Sources */ = {isa = PBXBuildFile; fileRef = D716BC74237A780D0095DC5E /* CSSSyntaxHighlighters.swift */; };
 		D72DB5AB232F23CB003FFA85 /* AccordionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72DB5AA232F23CB003FFA85 /* AccordionView.swift */; };
 		D72DB5AD232F344C003FFA85 /* CurtainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72DB5AC232F344C003FFA85 /* CurtainView.swift */; };
 		D730436D232C9BE600F9165F /* FileExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D730436C232C9BE600F9165F /* FileExtension.swift */; };
@@ -92,6 +95,9 @@
 		D70EB6912328A0FC0022D9C1 /* FileTreeItemHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeItemHolder.swift; sourceTree = "<group>"; };
 		D70EB6932328A2D20022D9C1 /* FileTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTreeView.swift; sourceTree = "<group>"; };
 		D70EB6952328B5C60022D9C1 /* String+subscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+subscript.swift"; sourceTree = "<group>"; };
+		D716BC70237A5A970095DC5E /* LaravelBladeSyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaravelBladeSyntaxHighlighter.swift; sourceTree = "<group>"; };
+		D716BC72237A5C580095DC5E /* PHPSyntaxHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PHPSyntaxHighlighter.swift; sourceTree = "<group>"; };
+		D716BC74237A780D0095DC5E /* CSSSyntaxHighlighters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSSSyntaxHighlighters.swift; sourceTree = "<group>"; };
 		D72DB5AA232F23CB003FFA85 /* AccordionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccordionView.swift; sourceTree = "<group>"; };
 		D72DB5AC232F344C003FFA85 /* CurtainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurtainView.swift; sourceTree = "<group>"; };
 		D730436C232C9BE600F9165F /* FileExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileExtension.swift; sourceTree = "<group>"; };
@@ -211,6 +217,9 @@
 			children = (
 				D730436E232C9C5700F9165F /* SyntaxHighlighter.swift */,
 				D7304370232CA33600F9165F /* HTMLSyntaxHighlighter.swift */,
+				D716BC70237A5A970095DC5E /* LaravelBladeSyntaxHighlighter.swift */,
+				D716BC72237A5C580095DC5E /* PHPSyntaxHighlighter.swift */,
+				D716BC74237A780D0095DC5E /* CSSSyntaxHighlighters.swift */,
 			);
 			path = SyntaxHighlighters;
 			sourceTree = "<group>";
@@ -655,9 +664,11 @@
 				D73599D723287DD0004D985E /* FileView.swift in Sources */,
 				D749DFB4232363F00010C673 /* MessagesViewController.swift in Sources */,
 				D7FE8B792325EB9900F4C6F5 /* Price.swift in Sources */,
+				D716BC75237A780D0095DC5E /* CSSSyntaxHighlighters.swift in Sources */,
 				D7305BBF2327833F006668B0 /* FormView.swift in Sources */,
 				D7F06169232511C50019B224 /* LessonComment.swift in Sources */,
 				D7961BEF23646109004F71CE /* FileOption.swift in Sources */,
+				D716BC71237A5A970095DC5E /* LaravelBladeSyntaxHighlighter.swift in Sources */,
 				D774F5232330B97D00D96899 /* UIImageView+fetch.swift in Sources */,
 				D70EB6942328A2D20022D9C1 /* FileTreeView.swift in Sources */,
 				D7F0617123251DA50019B224 /* Question.swift in Sources */,
@@ -667,6 +678,7 @@
 				D749DF7723234F830010C673 /* AppDelegate.swift in Sources */,
 				D7305BC423279ABA006668B0 /* FormViewController.swift in Sources */,
 				D73599DB232880D8004D985E /* LessonViewController.swift in Sources */,
+				D716BC73237A5C580095DC5E /* PHPSyntaxHighlighter.swift in Sources */,
 				D7305BB923271F90006668B0 /* RegisterViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

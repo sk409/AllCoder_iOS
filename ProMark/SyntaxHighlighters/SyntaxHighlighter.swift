@@ -11,6 +11,10 @@ struct SyntaxHighlighter {
         switch fileExtension {
         case .html:
             HTMLSyntaxHighlighter.highlight(mutableAttributedString)
+        case .php:
+            PHPSyntaxHighlighter.highlight(mutableAttributedString)
+        case .blade:
+            LaravelBladeSyntaxHighlighter.highlight(mutableAttributedString)
         }
         return mutableAttributedString
     }
