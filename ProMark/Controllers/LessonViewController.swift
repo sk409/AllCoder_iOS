@@ -513,7 +513,7 @@ fileprivate class CodeEditorView: UIScrollView {
         guard let file = file else {
             return
         }
-        let syntaxhighlightedText = SyntaxHighlighter.highlight(file: file) ?? NSMutableAttributedString(string: file.text)
+        let syntaxhighlightedText = SyntaxHighlighter.highlight(file: file) ?? NSMutableAttributedString(string: file.text, attributes: [.foregroundColor: UIColor.white])
         syntaxhighlightedText.addAttributes(textAttributes, range: syntaxhighlightedText.string.fullRange)
         self.syntaxhighlightedText = NSMutableAttributedString(attributedString: syntaxhighlightedText)
         questionViews.forEach { $0.removeFromSuperview() }
